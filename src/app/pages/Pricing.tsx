@@ -63,10 +63,6 @@ function PaymentModal({ isOpen, onClose, planType, planName, price, onPaymentSuc
           />
         </div>
 
-        <p style={{ fontSize: "0.75rem", color: "#9ca3af", textAlign: "center" }}>
-          沙箱环境测试中，使用 PayPal 沙箱账号完成支付
-        </p>
-
         <button
           onClick={onClose}
           className="w-full mt-4 py-2 rounded-lg"
