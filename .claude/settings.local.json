@@ -11,7 +11,9 @@
       "Bash(netstat -ano)",
       "Bash(npm start *)",
       "Bash(taskkill *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }

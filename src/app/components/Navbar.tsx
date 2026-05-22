@@ -120,7 +120,7 @@ export function Navbar() {
                 }}
               >
                 <LogOut size={14} />
-                退出
+                Sign Out
               </button>
             </>
           ) : (

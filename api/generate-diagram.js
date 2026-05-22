@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://aqdrywckvqrpuvaddsxj.supabase.co';
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxZHJ5d2NrdnFycHV2YWRkc3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzIwNTgsImV4cCI6MjA5NDc0ODA1OH0.mB7voJ7pT1LZ1iL9Rb3g5scm_CypmufPxb47t4sMmQ8';
 
-    // 扣积分（使用用户的 token，Supabase 会自动识别用户）
+    // 扣积分
     const deductResp = await fetch(`${supabaseUrl}/rest/v1/rpc/deduct_credits`, {
       method: 'POST',
       headers: {
@@ -44,24 +44,17 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: error.message || error.hint || '积分不足' });
     }
 
-    console.log('[DEBUG] 接收到的 prd:', prd);
-
-    // 预处理：检测关键词并强制指定类型
+    // 检测图表类型
     let forcedType = null;
     const prdLower = prd.toLowerCase();
 
     if (prdLower.includes('体验地图') || prdLower.includes('用户体验') ||
         prdLower.includes('旅程') || prdLower.includes('journey')) {
       forcedType = 'journey';
-      console.log('[DEBUG] 检测到关键词，强制类型为: journey');
     } else if (prdLower.includes('时序图') || prdLower.includes('sequence')) {
       forcedType = 'sequenceDiagram';
-      console.log('[DEBUG] 检测到关键词，强制类型为: sequenceDiagram');
     } else if (prdLower.includes('状态图') || prdLower.includes('state')) {
       forcedType = 'stateDiagram-v2';
-      console.log('[DEBUG] 检测到关键词，强制类型为: stateDiagram-v2');
-    } else {
-      console.log('[DEBUG] 未检测到特定关键词，使用默认逻辑');
     }
 
     const prompt = forcedType === 'journey'
@@ -94,43 +87,67 @@ ${forcedType ? `必须生成 ${forcedType} 类型的代码。` : '根据需求�
 
 只输出 \`\`\`mermaid 代码块，不要有任何解释文字。`;
 
-    const response = await fetch('https://api.minimaxi.com/anthropic/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': process.env.MINMAX_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2048,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ]
-      })
-    });
+    // 自动重试逻辑
+    let lastError = null;
+    const maxRetries = 3;
 
-    const data = await response.json();
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[Attempt ${attempt}/${maxRetries}] Calling MinMax API...`);
 
-    if (!response.ok) {
-      console.error('[MinMax API Error]:', data);
-      throw new Error(data.error?.message || 'AI service temporarily unavailable');
+        const response = await fetch('https://api.minimaxi.com/anthropic/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Api-Key': process.env.MINMAX_API_KEY,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-3-5-sonnet-20241022',
+            max_tokens: 2048,
+            messages: [
+              {
+                role: 'user',
+                content: prompt
+              }
+            ]
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error('[MinMax API Error]:', data);
+          throw new Error(data.error?.message || 'AI service temporarily unavailable');
+        }
+
+        const textContent = data.content?.find(item => item.type === 'text');
+        let mermaidCode = textContent?.text?.trim() || '';
+
+        if (!mermaidCode) {
+          console.error('[Empty Response]:', data);
+          throw new Error('AI returned empty response');
+        }
+
+        mermaidCode = mermaidCode.replace(/```mermaid\n?/g, '').replace(/```\n?$/g, '').trim();
+
+        console.log(`[Success] Generated code on attempt ${attempt}`);
+        return res.status(200).json({ code: mermaidCode });
+
+      } catch (error) {
+        lastError = error;
+        console.error(`[Attempt ${attempt} failed]:`, error.message);
+
+        if (attempt < maxRetries) {
+          const delay = attempt * 1000;
+          console.log(`[Retrying in ${delay}ms...]`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
     }
 
-    const textContent = data.content?.find(item => item.type === 'text');
-    let mermaidCode = textContent?.text?.trim() || '';
+    throw new Error(`Failed after ${maxRetries} attempts. ${lastError?.message || 'Please try again later.'}`);
 
-    if (!mermaidCode) {
-      console.error('[Empty Response]:', data);
-      throw new Error('AI returned empty response. Please try again.');
-    }
-
-    mermaidCode = mermaidCode.replace(/```mermaid\n?/g, '').replace(/```\n?$/g, '').trim();
-
-    res.status(200).json({ code: mermaidCode });
   } catch (error) {
     console.error('生成图表失败:', error);
     res.status(500).json({ error: error.message });
