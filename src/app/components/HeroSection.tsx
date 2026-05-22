@@ -1,10 +1,11 @@
-import { ArrowRight, FileText, GitBranch, Map } from "lucide-react";
+import { ArrowRight, FileText, GitBranch, Map, Upload, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useLang } from "../i18n";
 import { Link, useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AuthModal } from "./AuthModal";
 import { useAuth } from "../contexts/AuthContext";
+import * as mammoth from "mammoth";
 
 export function HeroSection() {
   const { t } = useLang();
@@ -12,14 +13,9 @@ export function HeroSection() {
   const [prompt, setPrompt] = useState("");
   const [showAuth, setShowAuth] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; content: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
-
-  const stats = [
-    { value: "100K+", label: t.statPRDs },
-    { value: "500K+", label: t.statDiagrams },
-    { value: "<10s", label: t.statTime },
-    { value: "95%+", label: t.statAccuracy },
-  ];
 
   const features = [
     { icon: <FileText size={20} />, label: t.typeSequence, desc: t.typeSequenceDesc, color: "#7c3aed" },
@@ -27,8 +23,41 @@ export function HeroSection() {
     { icon: <Map size={20} />, label: t.typeJourney, desc: t.typeJourneyDesc, color: "#a855f7" },
   ];
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isDocx = file.name.endsWith('.docx');
+    const isTxt = file.name.endsWith('.txt');
+
+    if (!isDocx && !isTxt) {
+      alert('Only .docx and .txt files are supported');
+      return;
+    }
+
+    try {
+      if (isTxt) {
+        const text = await file.text();
+        setUploadedFile({ name: file.name, content: text });
+      } else {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        setUploadedFile({ name: file.name, content: result.value });
+      }
+    } catch (error) {
+      console.error('File parsing error:', error);
+      alert('Failed to parse file');
+    }
+  };
+
   const handleGenerate = async () => {
-    if (!prompt.trim()) return;
+    const fileContent = uploadedFile?.content || '';
+    const textContent = prompt.trim();
+    const combinedContent = fileContent && textContent
+      ? `${fileContent}\n\n${textContent}`
+      : fileContent || textContent;
+
+    if (!combinedContent) return;
 
     if (!user) {
       setShowAuth(true);
@@ -44,7 +73,7 @@ export function HeroSection() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          prd: prompt.trim()
+          prd: combinedContent
         })
       });
 
@@ -53,8 +82,8 @@ export function HeroSection() {
       }
 
       const data = await response.json();
-      console.log('[首页-AI返回的原始代码]:', data.code);
-      navigate(`/editor?code=${encodeURIComponent(data.code)}`);
+      sessionStorage.setItem('mermaidCode', data.code);
+      navigate('/editor');
     } catch (error) {
       console.error('生成失败:', error);
       alert('生成图表失败，请重试');
@@ -139,8 +168,8 @@ export function HeroSection() {
                 }
               }}
               placeholder={t.heroPlaceholder}
-              className="w-full px-5 py-4 rounded-2xl resize-none focus:outline-none"
-              rows={3}
+              className="w-full px-5 rounded-2xl resize-none focus:outline-none"
+              rows={5}
               style={{
                 background: "#fff",
                 border: "1.5px solid rgba(124,58,237,0.15)",
@@ -149,19 +178,57 @@ export function HeroSection() {
                 fontSize: "1rem",
                 lineHeight: 1.6,
                 fontFamily: "'Inter', -apple-system, sans-serif",
+                paddingTop: uploadedFile ? "3rem" : "1rem",
+                paddingBottom: "1rem",
               }}
             />
+
+            {/* Uploaded file indicator */}
+            {uploadedFile && (
+              <div className="absolute top-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                style={{ background: "#ede9fe", border: "1px solid rgba(124,58,237,0.2)" }}>
+                <FileText size={14} style={{ color: "#7c3aed" }} />
+                <span className="text-xs" style={{ color: "#7c3aed", fontWeight: 500 }}>{uploadedFile.name}</span>
+                <button
+                  onClick={() => setUploadedFile(null)}
+                  className="ml-1"
+                  style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
+                  <X size={14} style={{ color: "#7c3aed" }} />
+                </button>
+              </div>
+            )}
+
             <div className="absolute bottom-3 right-3 flex items-center gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".docx,.txt"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg"
+                style={{
+                  background: "#f5f3ff",
+                  border: "1px solid rgba(124,58,237,0.2)",
+                  color: "#7c3aed",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                  fontWeight: 500,
+                }}>
+                <Upload size={16} />
+              </button>
               <span className="text-xs" style={{ color: "#9ca3af" }}>Ctrl+Enter</span>
               <button
                 onClick={handleGenerate}
-                disabled={isGenerating || !prompt.trim()}
+                disabled={isGenerating || (!prompt.trim() && !uploadedFile)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl"
                 style={{
-                  background: isGenerating || !prompt.trim() ? "#d1d5db" : "linear-gradient(135deg, #7c3aed, #a855f7)",
+                  background: isGenerating || (!prompt.trim() && !uploadedFile) ? "#d1d5db" : "linear-gradient(135deg, #7c3aed, #a855f7)",
                   border: "none",
                   color: "#fff",
-                  cursor: isGenerating || !prompt.trim() ? "not-allowed" : "pointer",
+                  cursor: isGenerating || (!prompt.trim() && !uploadedFile) ? "not-allowed" : "pointer",
                   fontWeight: 600,
                   fontSize: "0.95rem",
                   boxShadow: "0 4px 16px rgba(124,58,237,0.3)",
@@ -175,50 +242,32 @@ export function HeroSection() {
         </div>
 
         {/* Feature types */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-2xl mb-8">
           {features.map((f, i) => (
             <motion.div
               key={f.label}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + i * 0.1, duration: 0.5 }}
-              className="flex items-center gap-3 p-4 rounded-xl"
+              className="flex items-center gap-2.5 p-3 rounded-xl"
               style={{
                 background: "#fff",
                 border: "1.5px solid rgba(124,58,237,0.1)",
                 boxShadow: "0 2px 12px rgba(124,58,237,0.06)",
               }}
             >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                 style={{ background: `${f.color}15`, color: f.color }}>
                 {f.icon}
               </div>
               <div className="text-left">
-                <div style={{ fontWeight: 600, color: "#1e0a3c", fontSize: "0.95rem" }}>{f.label}</div>
-                <div style={{ color: "#9ca3af", fontSize: "0.8rem" }}>{f.desc}</div>
+                <div style={{ fontWeight: 600, color: "#1e0a3c", fontSize: "0.85rem" }}>{f.label}</div>
+                <div style={{ color: "#9ca3af", fontSize: "0.75rem" }}>{f.desc}</div>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-px w-full max-w-2xl rounded-2xl overflow-hidden"
-          style={{ border: "1.5px solid rgba(124,58,237,0.12)", background: "rgba(124,58,237,0.12)" }}
-        >
-          {stats.map((s) => (
-            <div key={s.label} className="flex flex-col items-center py-5 px-3"
-              style={{ background: "#fff" }}>
-              <span style={{ color: "#7c3aed", fontWeight: 800, fontSize: "1.6rem", letterSpacing: "-0.03em" }}>
-                {s.value}
-              </span>
-              <span className="text-xs mt-1" style={{ color: "#9ca3af" }}>{s.label}</span>
-            </div>
-          ))}
-        </motion.div>
       </motion.div>
 
       {/* Scroll hint */}

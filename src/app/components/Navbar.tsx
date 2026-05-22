@@ -15,7 +15,7 @@ export function Navbar() {
   const links = [
     { label: t.navFeatures, href: "/#features", external: true },
     { label: t.navPricing, href: "/pricing", external: false },
-    { label: t.navAbout, href: "#about", external: true },
+    { label: t.navFAQ, href: "/faq", external: false },
     { label: t.navBlog, href: "#blog", external: true },
   ];
 

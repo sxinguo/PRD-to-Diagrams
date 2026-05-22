@@ -230,19 +230,21 @@ export function Pricing() {
                 ))}
               </ul>
 
-              <button
-                onClick={() => handleSelectPlan(p)}
-                className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm"
-                style={{
-                  background: p.highlight ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "#f5f3ff",
-                  border: p.highlight ? "none" : "1.5px solid rgba(124,58,237,0.2)",
-                  color: p.highlight ? "#fff" : "#7c3aed",
-                  cursor: "pointer", fontWeight: 600,
-                  boxShadow: p.highlight ? "0 4px 20px rgba(124,58,237,0.3)" : "none",
-                }}>
-                {p.highlight && <Zap size={14} />}
-                {p.cta}
-              </button>
+              {p.key !== "free" && (
+                <button
+                  onClick={() => handleSelectPlan(p)}
+                  className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm"
+                  style={{
+                    background: p.highlight ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "#f5f3ff",
+                    border: p.highlight ? "none" : "1.5px solid rgba(124,58,237,0.2)",
+                    color: p.highlight ? "#fff" : "#7c3aed",
+                    cursor: "pointer", fontWeight: 600,
+                    boxShadow: p.highlight ? "0 4px 20px rgba(124,58,237,0.3)" : "none",
+                  }}>
+                  {p.highlight && <Zap size={14} />}
+                  {p.cta}
+                </button>
+              )}
             </motion.div>
           ))}
         </div>

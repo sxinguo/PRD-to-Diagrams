@@ -5,6 +5,7 @@ import { Pricing } from "./pages/Pricing";
 import { EditorPage } from "./pages/Editor";
 import { RefundPolicyPage } from "./pages/RefundPolicy";
 import { PrivacyPolicyPage } from "./pages/PrivacyPolicy";
+import { FAQPage } from "./pages/FAQPage";
 import HandleGenerateDebug from "./pages/HandleGenerateDebug";
 
 export const router = createBrowserRouter([
@@ -16,6 +17,7 @@ export const router = createBrowserRouter([
       { path: "pricing", Component: Pricing },
       { path: "refund-policy", Component: RefundPolicyPage },
       { path: "privacy-policy", Component: PrivacyPolicyPage },
+      { path: "faq", Component: FAQPage },
     ],
   },
   {

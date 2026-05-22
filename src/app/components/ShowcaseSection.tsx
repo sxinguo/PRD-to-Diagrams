@@ -104,7 +104,7 @@ export function ShowcaseSection() {
   const visible = active === "all" ? items : items.filter(i => i.category === active);
 
   return (
-    <section id="showcase" className="w-full px-4 md:px-8 lg:px-16 py-20"
+    <section id="showcase" className="w-full px-4 md:px-8 lg:px-16 py-12"
       style={{ background: "#fff" }}>
       <div className="max-w-6xl mx-auto">
 

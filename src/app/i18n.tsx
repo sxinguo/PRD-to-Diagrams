@@ -7,7 +7,7 @@ export const translations = {
     // Navbar
     navFeatures: "Features",
     navPricing: "Pricing",
-    navAbout: "About",
+    navFAQ: "FAQ",
     navBlog: "Blog",
     navSignIn: "Sign In",
     navGetStarted: "Get Started Free",
@@ -129,7 +129,7 @@ export const translations = {
   zh: {
     navFeatures: "功能",
     navPricing: "价格",
-    navAbout: "关于",
+    navFAQ: "常见问题",
     navBlog: "博客",
     navSignIn: "登录",
     navGetStarted: "免费开始使用",

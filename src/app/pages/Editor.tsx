@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Zap, FileText, Download, RotateCcw, CheckCircle, GitBranch, Map, List, Copy, Eye, ZoomIn, ZoomOut, Sparkles, Send, Palette, Move } from "lucide-react";
+import { Zap, FileText, Download, RotateCcw, CheckCircle, GitBranch, Map, List, Copy, Eye, ZoomIn, ZoomOut, Sparkles, Send, Palette, Move, Upload, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useLang } from "../i18n";
 import mermaid from "mermaid";
@@ -7,6 +7,7 @@ import MonacoEditor from "@monaco-editor/react";
 import { useSearchParams } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../../lib/supabase";
+import * as mammoth from "mammoth";
 
 const SUPABASE_URL = "https://aqdrywckvqrpuvaddsxj.supabase.co";
 const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxZHJ5d2NrdnFycHV2YWRkc3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzIwNTgsImV4cCI6MjA5NDc0ODA1OH0.mB7voJ7pT1LZ1iL9Rb3g5scm_CypmufPxb47t4sMmQ8";
@@ -97,7 +98,13 @@ export function EditorPage() {
   const { t, lang } = useLang();
   const [searchParams] = useSearchParams();
   const initialPrompt = searchParams.get('prompt') || '';
-  const initialCode = searchParams.get('code') || '';
+  const initialCode = searchParams.get('code') || sessionStorage.getItem('mermaidCode') || '';
+
+  useEffect(() => {
+    if (sessionStorage.getItem('mermaidCode')) {
+      sessionStorage.removeItem('mermaidCode');
+    }
+  }, []);
   const { user, profile, refreshProfile } = useAuth();
 
   const [diagramType, setDiagramType] = useState<DiagramType>("sequence");
@@ -109,6 +116,8 @@ export function EditorPage() {
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [isAIGenerating, setIsAIGenerating] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; content: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [scale, setScale] = useState(1);
   const [isPinching, setIsPinching] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -594,8 +603,41 @@ export function EditorPage() {
     // 重新生成功能已移除，用户应使用AI生成
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isDocx = file.name.endsWith('.docx');
+    const isTxt = file.name.endsWith('.txt');
+
+    if (!isDocx && !isTxt) {
+      alert('仅支持 .docx 和 .txt 文件');
+      return;
+    }
+
+    try {
+      if (isTxt) {
+        const text = await file.text();
+        setUploadedFile({ name: file.name, content: text });
+      } else {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        setUploadedFile({ name: file.name, content: result.value });
+      }
+    } catch (error) {
+      console.error('文件解析错误:', error);
+      alert('文件解析失败');
+    }
+  };
+
   const handleAIGenerate = async () => {
-    if (!aiPrompt.trim()) return;
+    const fileContent = uploadedFile?.content || '';
+    const textContent = aiPrompt.trim();
+    const combinedContent = fileContent && textContent
+      ? `${fileContent}\n\n${textContent}`
+      : fileContent || textContent;
+
+    if (!combinedContent) return;
 
     // 检查积分并扣减
     if (user && profile) {
@@ -657,7 +699,7 @@ export function EditorPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          prd: aiPrompt,
+          prd: combinedContent,
           diagramType: diagramType
         })
       });
@@ -672,6 +714,9 @@ export function EditorPage() {
       setIsAIGenerating(false);
       setShowAIChat(false);
       setAiPrompt("");
+
+      // 自动渲染生成的代码
+      await renderMermaid(generated);
     } catch (error) {
       alert('生成图表失败，请重试');
       setIsAIGenerating(false);
@@ -824,7 +869,7 @@ export function EditorPage() {
                     <ZoomOut size={14} />
                   </button>
                   <span style={{ fontSize: "0.75rem", color: "#7c3aed", minWidth: "45px", textAlign: "center" }}>{zoom}%</span>
-                  <button onClick={() => setZoom(z => Math.min(200, z + 25))} className="p-1 rounded hover:bg-purple-100" style={{ border: "none", background: "transparent", cursor: "pointer", color: "#7c3aed" }}>
+                  <button onClick={() => setZoom(z => Math.min(400, z + 25))} className="p-1 rounded hover:bg-purple-100" style={{ border: "none", background: "transparent", cursor: "pointer", color: "#7c3aed" }}>
                     <ZoomIn size={14} />
                   </button>
                 </div>
@@ -962,6 +1007,19 @@ export function EditorPage() {
             <p style={{ fontSize: "0.85rem", color: "#6b7280", marginBottom: "16px" }}>
               Describe what diagram you want to create
             </p>
+
+            {uploadedFile && (
+              <div className="mb-3 p-2 rounded-lg flex items-center justify-between" style={{ background: "#f3f4f6", border: "1px solid #e5e7eb" }}>
+                <div className="flex items-center gap-2">
+                  <FileText size={16} style={{ color: "#7c3aed" }} />
+                  <span style={{ fontSize: "0.85rem", color: "#374151" }}>{uploadedFile.name}</span>
+                </div>
+                <button onClick={() => setUploadedFile(null)} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#6b7280" }}>
+                  <X size={16} />
+                </button>
+              </div>
+            )}
+
             <textarea
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
@@ -974,19 +1032,38 @@ export function EditorPage() {
                 }
               }}
             />
-            <div className="flex items-center justify-end gap-2 mt-4">
-              <button onClick={() => setShowAIChat(false)}
-                className="px-4 py-2 rounded-lg text-sm"
-                style={{ background: "transparent", border: "1px solid #e5e7eb", color: "#6b7280", cursor: "pointer" }}>
-                Cancel
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".docx,.txt"
+              onChange={handleFileUpload}
+              style={{ display: 'none' }}
+            />
+
+            <div className="flex items-center justify-between mt-4">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
+                style={{ background: "transparent", border: "1px solid rgba(124,58,237,0.3)", color: "#7c3aed", cursor: "pointer" }}
+              >
+                <Upload size={14} />
+                上传文档
               </button>
-              <button onClick={handleAIGenerate} disabled={!aiPrompt.trim() || isAIGenerating}
+
+              <div className="flex items-center gap-2">
+                <button onClick={() => setShowAIChat(false)}
+                  className="px-4 py-2 rounded-lg text-sm"
+                  style={{ background: "transparent", border: "1px solid #e5e7eb", color: "#6b7280", cursor: "pointer" }}>
+                  Cancel
+                </button>
+                <button onClick={handleAIGenerate} disabled={(!aiPrompt.trim() && !uploadedFile) || isAIGenerating}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm"
                 style={{
-                  background: aiPrompt.trim() && !isAIGenerating ? "linear-gradient(135deg, #7c3aed, #a855f7)" : "#e5e7eb",
+                  background: (aiPrompt.trim() || uploadedFile) && !isAIGenerating ? "linear-gradient(135deg, #7c3aed, #a855f7)" : "#e5e7eb",
                   border: "none",
                   color: "#fff",
-                  cursor: aiPrompt.trim() && !isAIGenerating ? "pointer" : "not-allowed"
+                  cursor: (aiPrompt.trim() || uploadedFile) && !isAIGenerating ? "pointer" : "not-allowed"
                 }}>
                 {isAIGenerating ? (
                   <>Generating...</>
@@ -998,6 +1075,7 @@ export function EditorPage() {
                 )}
               </button>
             </div>
+          </div>
           </motion.div>
         </div>
       )}

@@ -27,20 +27,20 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  console.log("AuthProvider rendering...");
+  // // console.log("AuthProvider rendering...");
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
 
   const fetchProfile = async (userId: string) => {
-    console.log("=== fetchProfile START ===");
+    // // console.log("=== fetchProfile START ===");
 
     try {
       // 直接用 hardcoded 的 URL 和 key，避免依赖 supabase SDK
       const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxZHJ5d2NrdnFycHV2YWRkc3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzIwNTgsImV4cCI6MjA5NDc0ODA1OH0.mB7voJ7pT1LZ1iL9Rb3g5scm_CypmufPxb47t4sMmQ8";
 
-      console.log("Using direct fetch for profile...");
+      // // console.log("Using direct fetch for profile...");
 
       const response = await fetch(
         `https://aqdrywckvqrpuvaddsxj.supabase.co/rest/v1/profiles?id=eq.${userId}&select=credits_remaining,total_credits,subscription_plan`,
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       );
 
-      console.log("fetchProfile - HTTP status:", response.status);
+      // console.log("fetchProfile - HTTP status:", response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const data = await response.json();
-      console.log("fetchProfile - response:", data);
+      // console.log("fetchProfile - response:", data);
 
       if (Array.isArray(data) && data.length > 0) {
         const p = data[0];
@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("fetchProfile exception:", error);
       setProfile({ credits_remaining: 0, total_credits: 0, subscription_plan: "free" });
     }
-    console.log("=== fetchProfile END ===");
+    // console.log("=== fetchProfile END ===");
   };
 
   const checkAndApplyDailyBonus = async (userId: string) => {
@@ -133,9 +133,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    console.log("AuthContext useEffect initializing...");
+    // console.log("AuthContext useEffect initializing...");
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Got session:", !!session, session?.user?.id);
+      // console.log("Got session:", !!session, session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        console.log("Auth state changed:", _event, !!session);
+        // console.log("Auth state changed:", _event, !!session);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -164,13 +164,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    console.log("signOut clicked");
+    // console.log("signOut clicked");
     await supabase.auth.signOut();
-    console.log("signOut done");
+    // console.log("signOut done");
   };
 
   const refreshProfile = async () => {
-    console.log("=== refreshProfile START ===");
+    // console.log("=== refreshProfile START ===");
     try {
       // 获取当前用户
       const { data: { session } } = await supabase.auth.getSession();
@@ -182,7 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("refreshProfile error:", error);
     }
-    console.log("=== refreshProfile END ===");
+    // console.log("=== refreshProfile END ===");
   };
 
   return (
