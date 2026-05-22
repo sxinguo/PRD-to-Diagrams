@@ -44,8 +44,7 @@ export function HeroSection() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          prd: prompt.trim(),
-          diagramType: 'sequence'
+          prd: prompt.trim()
         })
       });
 
@@ -54,6 +53,7 @@ export function HeroSection() {
       }
 
       const data = await response.json();
+      console.log('[首页-AI返回的原始代码]:', data.code);
       navigate(`/editor?code=${encodeURIComponent(data.code)}`);
     } catch (error) {
       console.error('生成失败:', error);

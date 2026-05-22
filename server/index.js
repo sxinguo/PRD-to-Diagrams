@@ -15,19 +15,57 @@ app.use(express.json());
 
 app.post('/api/generate-diagram', async (req, res) => {
   try {
-    const { prd, diagramType = 'sequence' } = req.body;
+    const { prd } = req.body;
 
-    const prompt = `你是一个专业的技术文档分析师。请根据以下PRD文档生成${diagramType === 'sequence' ? '时序图' : diagramType === 'flowchart' ? '流程图' : '用户旅程图'}的Mermaid代码。
+    console.log('[DEBUG] 接收到的 prd:', prd);
 
-PRD内容：
-${prd}
+    // 预处理：检测关键词并强制指定类型
+    let forcedType = null;
+    const prdLower = prd.toLowerCase();
+
+    if (prdLower.includes('体验地图') || prdLower.includes('用户体验') ||
+        prdLower.includes('旅程') || prdLower.includes('journey')) {
+      forcedType = 'journey';
+      console.log('[DEBUG] 检测到关键词，强制类型为: journey');
+    } else if (prdLower.includes('时序图') || prdLower.includes('sequence')) {
+      forcedType = 'sequenceDiagram';
+      console.log('[DEBUG] 检测到关键词，强制类型为: sequenceDiagram');
+    } else if (prdLower.includes('状态图') || prdLower.includes('state')) {
+      forcedType = 'stateDiagram-v2';
+      console.log('[DEBUG] 检测到关键词，强制类型为: stateDiagram-v2');
+    } else {
+      console.log('[DEBUG] 未检测到特定关键词，使用默认逻辑');
+    }
+
+    const prompt = forcedType === 'journey'
+      ? `你必须生成 journey 类型的 Mermaid 用户体验地图代码。
+
+严格使用以下格式：
+\`\`\`mermaid
+journey
+    title 用户体验标题
+    section 阶段名称
+        任务描述: 情绪分数(1-5): 角色名
+        任务描述: 情绪分数(1-5): 角色名
+\`\`\`
+
+用户需求：${prd}
 
 要求：
-1. 只返回纯Mermaid代码，不要有markdown代码块标记
-2. 代码必须符合Mermaid语法规范
-3. ${diagramType === 'sequence' ? '使用sequenceDiagram关键字开头，清晰展示各个参与者之间的交互流程' : diagramType === 'flowchart' ? '使用flowchart TD开头，展示完整的业务流程' : '使用journey关键字开头，展示用户旅程'}
-4. 确保所有参与者、节点和流程都清晰明确
-5. 使用中文标注`;
+1. 必须以 journey 开头
+2. 必须包含 title
+3. 使用 section 划分阶段
+4. 每个任务格式：任务描述: 分数: 角色
+5. 只输出代码块，不要有任何解释
+
+现在生成 journey 代码：`
+      : `你是 Mermaid 代码生成专家。
+
+用户需求：${prd}
+
+${forcedType ? `必须生成 ${forcedType} 类型的代码。` : '根据需求选择合适的图表类型。'}
+
+只输出 \`\`\`mermaid 代码块，不要有任何解释文字。`;
 
     const response = await fetch('https://api.minimaxi.com/anthropic/v1/messages', {
       method: 'POST',
@@ -66,6 +104,9 @@ ${prd}
 
     // 移除markdown代码块标记
     mermaidCode = mermaidCode.replace(/```mermaid\n?/g, '').replace(/```\n?$/g, '').trim();
+
+    console.log('[API返回的mermaid代码]:', mermaidCode);
+    console.log('[代码类型]:', mermaidCode.split('\n')[0]);
 
     res.json({ code: mermaidCode });
   } catch (error) {

@@ -93,85 +93,6 @@ const DEMO_MERMAID = `sequenceDiagram
         System-->>User: 8. 显示错误提示（剩余重试次数）
     end`;
 
-// 简单的自然语言转 Mermaid 规则（后续替换为 AI）
-function promptToMermaid(prompt: string): string {
-  const lower = prompt.toLowerCase();
-
-  // 时序图关键词
-  if (lower.includes('时序') || lower.includes('sequence') || lower.includes('登录') || lower.includes('注册') || lower.includes('流程')) {
-    if (lower.includes('登录')) {
-      return `sequenceDiagram
-    participant User as 用户
-    participant System as 系统
-    participant API as 短信API
-
-    User->>System: 输入手机号，点击获取验证码
-    System->>API: 请求发送验证码
-    API-->>System: 返回发送成功
-    System-->>User: 显示"验证码已发送"
-    User->>System: 输入验证码
-    System->>System: 验证验证码
-    alt 验证成功
-        System-->>User: 登录成功，跳转首页
-    else 验证失败
-        System-->>User: 显示错误提示
-    end`;
-    }
-    if (lower.includes('支付')) {
-      return `sequenceDiagram
-    participant User as 用户
-    participant System as 系统
-    participant Payment as 支付系统
-    participant Merchant as 商户
-
-    User->>System: 选择商品，提交订单
-    System-->>User: 显示订单确认页
-    User->>System: 确认支付
-    System->>Payment: 发起支付请求
-    Payment-->>User: 展示支付方式选择
-    User->>Payment: 选择支付方式并验证
-    Payment->>Merchant: 通知支付成功
-    Merchant-->>System: 订单完成
-    System-->>User: 显示支付成功`;
-    }
-    // 默认时序图
-    return `sequenceDiagram
-    participant User as 用户
-    participant System as 系统
-
-    User->>System: ${prompt.slice(0, 50)}
-    System-->>User: 响应结果`;
-  }
-
-  // 流程图关键词
-  if (lower.includes('流程') || lower.includes('flow') || lower.includes('审批') || lower.includes('订单')) {
-    if (lower.includes('订单')) {
-      return `flowchart TD
-    A[开始] --> B[创建订单]
-    B --> C{库存充足?}
-    C -- 是 --> D[扣减库存]
-    C -- 否 --> E[提示库存不足]
-    D --> F[计算金额]
-    F --> G{支付成功?}
-    G -- 是 --> H[生成订单]
-    H --> I[通知用户]
-    G -- 否 --> J[支付失败]
-    J --> B
-    E --> K[结束]`;
-    }
-    return `flowchart TD
-    A[开始] --> B[步骤1]
-    B --> C{条件判断}
-    C -- 是 --> D[执行操作A]
-    C -- 否 --> E[执行操作B]
-    D --> F[结束]
-    E --> F`;
-  }
-
-  // 默认返回示例
-  return DEMO_MERMAID;
-}
-
 export function EditorPage() {
   const { t, lang } = useLang();
   const [searchParams] = useSearchParams();
@@ -188,6 +109,9 @@ export function EditorPage() {
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [isAIGenerating, setIsAIGenerating] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [isPinching, setIsPinching] = useState(false);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<keyof typeof COLOR_THEMES>("purple");
   const [viewMode, setViewMode] = useState(false);
@@ -332,6 +256,58 @@ export function EditorPage() {
     }
   }, [viewMode, isPanning]);
 
+  useEffect(() => {
+    const container = imageContainerRef.current;
+    if (!container) return;
+
+    let initialDistance = 0;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        setScale(prev => Math.max(0.5, Math.min(3, prev + delta)));
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        setIsPinching(true);
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        initialDistance = Math.sqrt(dx * dx + dy * dy);
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && isPinching) {
+        e.preventDefault();
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const delta = (distance - initialDistance) * 0.01;
+        setScale(prev => Math.max(0.5, Math.min(3, prev + delta)));
+        initialDistance = distance;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setIsPinching(false);
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener('touchstart', handleTouchStart);
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isPinching]);
+
   const diagramTypes: { id: DiagramType; label: string; icon: React.ReactNode }[] = [
     { id: "sequence", label: t.typeSequence, icon: <List size={16} /> },
     { id: "flowchart", label: t.typeFlowchart, icon: <GitBranch size={16} /> },
@@ -382,7 +358,6 @@ export function EditorPage() {
         setIsDone(true);
       }
     } catch (error) {
-      console.error('Mermaid render error:', error);
       if (mermaidRef.current) {
         mermaidRef.current.innerHTML = `<div style="color: #ef4444; padding: 20px; text-align: center; background: #fef2f2; border-radius: 12px;">Diagram syntax error</div>`;
       }
@@ -393,9 +368,6 @@ export function EditorPage() {
   useEffect(() => {
     if (initialCode) {
       setIsDone(true);
-    } else if (initialPrompt) {
-      const generated = promptToMermaid(initialPrompt);
-      setCode(generated);
     }
   }, [initialPrompt, initialCode]);
 
@@ -459,7 +431,6 @@ export function EditorPage() {
           setIsDone(true);
         }
       } catch (error) {
-        console.error('Mermaid render error:', error);
         if (mermaidRef.current) {
           mermaidRef.current.innerHTML = `<div style="color: #ef4444; padding: 20px; text-align: center; background: #fef2f2; border-radius: 12px;">Diagram syntax error</div>`;
         }
@@ -470,10 +441,7 @@ export function EditorPage() {
   }, [code, currentTheme]);
 
   const handleGenerate = useCallback(async () => {
-    console.log("[handleGenerate] START");
     try {
-      console.log("[handleGenerate] code:", code?.substring(0, 50));
-      console.log("[handleGenerate] user:", user?.id, "profile:", profile?.credits_remaining);
 
       if (!code.trim()) {
         alert("请先输入 Mermaid 代码");
@@ -482,13 +450,11 @@ export function EditorPage() {
 
       // 检查积分并扣减
       if (user && profile) {
-        console.log("[handleGenerate] credits check, remaining:", profile.credits_remaining);
         if (profile.credits_remaining < 3) {
           alert("积分不足（当前 " + profile.credits_remaining + " 积分），请先购买积分");
           return;
         }
 
-        console.log("[handleGenerate] calling fetch...");
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
 
@@ -506,8 +472,6 @@ export function EditorPage() {
           amount: 3,
           description: "AI生成图表",
         };
-        console.log("[handleGenerate] request body:", JSON.stringify(requestBody));
-        console.log("[handleGenerate] has token:", !!session?.access_token);
 
         const resp = await fetch(
           `${SUPABASE_URL}/rest/v1/rpc/deduct_credits`,
@@ -524,47 +488,38 @@ export function EditorPage() {
         );
         clearTimeout(timeoutId);
 
-        console.log("[handleGenerate] fetch complete, status:", resp.status);
 
         if (!resp.ok) {
           const errText = await resp.text();
-          console.error("[handleGenerate] 扣积分失败:", resp.status, errText);
           alert("扣积分失败: " + errText);
           return;
         }
 
         const respText = await resp.text();
-        console.log("[handleGenerate] use_credits result:", respText);
 
         // refreshProfile 不 await，让它在后台更新积分显示，不阻塞 UI
         refreshProfile();
       } else {
-        console.log("[handleGenerate] skipping credit (no user or profile)");
       }
 
       setIsProcessing(true);
-      console.log("[handleGenerate] setIsProcessing(true) done");
 
       setProgress(0);
-      console.log("[handleGenerate] setProgress(0) done");
 
       const progressInterval = setInterval(() => {
         setProgress(prev => Math.min(prev + 12, 90));
       }, 80);
 
       await new Promise(resolve => setTimeout(resolve, 1200));
-      console.log("[handleGenerate] delay done");
 
       clearInterval(progressInterval);
       setProgress(100);
       setIsDone(true);
       setIsProcessing(false);
-      console.log("[handleGenerate] setIsDone(true) and setIsProcessing(false) done");
 
       await new Promise(resolve => setTimeout(resolve, 50));
 
       if (mermaidRef.current) {
-        console.log("[handleGenerate] mermaidRef found, rendering...");
         try {
           mermaid.initialize({
           startOnLoad: false,
@@ -572,9 +527,7 @@ export function EditorPage() {
           themeVariables: COLOR_THEMES[currentTheme]
         });
           const id = `mermaid-${Date.now()}`;
-          console.log("[handleGenerate] calling mermaid.render with id:", id);
           const { svg } = await mermaid.render(id, code);
-          console.log("[handleGenerate] mermaid.render done, svg length:", svg.length);
           mermaidRef.current.innerHTML = svg;
 
           // Apply glassmorphism effect
@@ -611,19 +564,14 @@ export function EditorPage() {
             }
           }
 
-          console.log("[handleGenerate] SVG set");
         } catch (error) {
-          console.error("[handleGenerate] render error:", error);
           if (mermaidRef.current) {
             mermaidRef.current.innerHTML = `<div style="color: #ef4444; padding: 20px; text-align: center; background: #fef2f2; border-radius: 12px;">Error</div>`;
           }
         }
       } else {
-        console.log("[handleGenerate] mermaidRef is null — NOT rendering SVG");
       }
-      console.log("[handleGenerate] END");
     } catch (err) {
-      console.error("[handleGenerate] 异常:", err);
     }
   }, [code, user, profile, refreshProfile]);
 
@@ -643,10 +591,7 @@ export function EditorPage() {
   };
 
   const handleRegenerate = () => {
-    if (initialPrompt) {
-      const generated = promptToMermaid(initialPrompt);
-      setCode(generated);
-    }
+    // 重新生成功能已移除，用户应使用AI生成
   };
 
   const handleAIGenerate = async () => {
@@ -660,7 +605,6 @@ export function EditorPage() {
       }
 
       try {
-        console.log("[handleAIGenerate] 开始扣积分, userId:", user.id);
 
         const { data: { session } } = await supabase.auth.getSession();
         const token = session?.access_token || ANON_KEY;
@@ -688,20 +632,16 @@ export function EditorPage() {
           }
         );
 
-        console.log("[handleAIGenerate] use_credits HTTP status:", resp.status);
 
         if (!resp.ok) {
           const errText = await resp.text();
-          console.error("[handleAIGenerate] 扣积分失败:", resp.status, errText);
           alert("扣积分失败: " + errText);
           return;
         }
 
         const respText = await resp.text();
-        console.log("[handleAIGenerate] use_credits response:", respText);
         await refreshProfile();
       } catch (err) {
-        console.error("[handleAIGenerate] 扣积分异常:", err);
         alert("扣积分失败，请重试");
         return;
       }
@@ -732,66 +672,14 @@ export function EditorPage() {
       setIsAIGenerating(false);
       setShowAIChat(false);
       setAiPrompt("");
-
-      // 自动渲染
-      setTimeout(() => {
-        if (mermaidRef.current) {
-          (async () => {
-            try {
-              const id = `mermaid-${Date.now()}`;
-              mermaid.initialize({
-                startOnLoad: false,
-                theme: 'base',
-                themeVariables: COLOR_THEMES[currentTheme]
-              });
-              const { svg } = await mermaid.render(id, generated);
-              if (mermaidRef.current) {
-                mermaidRef.current.innerHTML = svg;
-
-                // Apply glassmorphism effect
-                if (currentTheme === 'glassmorphism') {
-                  const svgEl = mermaidRef.current.querySelector('svg');
-                  if (svgEl) {
-                    const rects = svgEl.querySelectorAll('rect');
-                    const colors = ['#ff6b9d', '#c44569', '#4834df', '#30336b', '#00d2d3', '#0fb9b1', '#ffa502', '#ff6348', '#a29bfe', '#6c5ce7'];
-                    rects.forEach((rect, i) => {
-                      const color = colors[i % colors.length];
-                      rect.setAttribute('fill', color);
-                      rect.setAttribute('fill-opacity', '0.15');
-                      rect.setAttribute('style', 'backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);');
-                    });
-
-                    const paths = svgEl.querySelectorAll('path');
-                    paths.forEach(path => {
-                      path.setAttribute('stroke', '#333333');
-                      path.setAttribute('stroke-width', '2');
-                    });
-
-                    const lines = svgEl.querySelectorAll('line');
-                    lines.forEach(line => {
-                      line.setAttribute('stroke', '#333333');
-                      line.setAttribute('stroke-width', '2');
-                    });
-                  }
-                }
-
-                setIsDone(true);
-              }
-            } catch (error) {
-              console.error('[handleAIGenerate] Mermaid render error:', error);
-            }
-          })();
-        }
-      }, 100);
     } catch (error) {
-      console.error('AI生成失败:', error);
       alert('生成图表失败，请重试');
       setIsAIGenerating(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#f8f7ff", height: "100vh" }}>
+    <div className="min-h-screen flex flex-col" style={{ background: "#f5f3ff", height: "100vh" }}>
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-3"
         style={{ background: "#fff", borderBottom: "1px solid rgba(124,58,237,0.1)" }}>
@@ -802,11 +690,11 @@ export function EditorPage() {
         </div>
       </div>
 
-      {/* Main content: 40% editor / 60% preview */}
-      <div className="flex-1 flex" style={{ overflow: "hidden" }}>
-        {/* Left: Monaco Editor (40%) */}
+      {/* Main content: 30% editor / 70% preview */}
+      <div className="flex-1 flex" style={{ overflow: "hidden", background: "#f5f3ff" }}>
+        {/* Left: Monaco Editor (30%) */}
         <div className="flex flex-col border-r"
-          style={{ width: "40%", borderColor: "rgba(124,58,237,0.1)", background: "#fff", height: "100%" }}>
+          style={{ width: "30%", borderColor: "rgba(124,58,237,0.1)", background: "#fafbff", height: "100%" }}>
           {/* Editor toolbar */}
           <div className="flex items-center justify-between px-4 py-2"
             style={{ background: "#fafbff", borderBottom: "1px solid rgba(124,58,237,0.08)" }}>
@@ -841,7 +729,6 @@ export function EditorPage() {
               theme="light"
               loading={<div style={{ padding: "20px", textAlign: "center", color: "#7c3aed" }}>Loading editor...</div>}
               onMount={(editor) => {
-                console.log('Monaco editor mounted', editor);
               }}
               options={{
                 minimap: { enabled: false },
@@ -898,10 +785,15 @@ export function EditorPage() {
         </div>
 
         {/* Right: Preview (60%) */}
-        <div className="flex-1 flex flex-col" style={{ background: "#ffffff" }}>
+        <div className="flex-1 flex flex-col" style={{
+          background: "#ffffff",
+          backgroundImage: "radial-gradient(circle, rgba(124,58,237,0.03) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+          position: "relative"
+        }}>
           {/* Preview toolbar */}
           <div className="flex items-center justify-between px-4 py-2"
-            style={{ borderBottom: "1px solid rgba(124,58,237,0.08)", background: "#ffffff" }}>
+            style={{ borderBottom: "1px solid rgba(124,58,237,0.08)", background: "#fafbff" }}>
             <div className="flex items-center gap-2">
               <Eye size={14} style={{ color: "#7c3aed" }} />
               <span style={{ fontSize: "0.85rem", color: "#6b7280" }}>Preview</span>
@@ -990,7 +882,10 @@ export function EditorPage() {
             style={{
               position: 'relative',
               userSelect: 'none',
-              cursor: isPanning ? 'grabbing' : (viewMode ? 'grab' : 'default')
+              cursor: isPanning ? 'grabbing' : (viewMode ? 'grab' : 'default'),
+              background: "#ffffff",
+              backgroundImage: "radial-gradient(circle, rgba(124,58,237,0.03) 1px, transparent 1px)",
+              backgroundSize: "20px 20px"
             }}
           >
             {isProcessing ? (
@@ -1015,14 +910,16 @@ export function EditorPage() {
                 </div>
               </div>
             ) : isDone ? (
-              <div className="h-full flex items-center justify-center">
+              <div className="h-full flex items-center justify-center" ref={imageContainerRef}>
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="w-full max-w-4xl"
                   style={{
-                    transform: `translate(${panOffset.x}px, ${panOffset.y}px)`,
-                    pointerEvents: 'none'
+                    transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${scale})`,
+                    pointerEvents: 'none',
+                    transformOrigin: 'center',
+                    transition: 'transform 0.1s'
                   }}
                 >
                   <div ref={mermaidRef} className="flex items-center justify-center" style={{ minHeight: "200px", transform: `scale(${zoom / 100})`, transformOrigin: "center", transition: "transform 0.2s" }} />
