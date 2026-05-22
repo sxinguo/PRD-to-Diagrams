@@ -52,10 +52,14 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     setIsOAuthPending(true);
     setMessage(null);
     try {
+      const redirectUrl = window.location.hostname === 'localhost'
+        ? `${window.location.origin}/`
+        : 'https://prdchart.art/';
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: redirectUrl,
         },
       });
       if (error) throw error;

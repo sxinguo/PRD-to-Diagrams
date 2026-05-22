@@ -66,8 +66,7 @@ export function HeroSection() {
 
     setIsGenerating(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '/api';
-      const response = await fetch(`${apiUrl}/generate-diagram`, {
+      const response = await fetch('/api/generate-diagram', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
