@@ -2,20 +2,45 @@ import { ArrowRight, FileText, GitBranch, Map, Upload, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useLang } from "../i18n";
 import { Link, useNavigate } from "react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AuthModal } from "./AuthModal";
 import { useAuth } from "../contexts/AuthContext";
 import * as mammoth from "mammoth";
+import { supabase } from "../../lib/supabase";
 
 export function HeroSection() {
   const { t } = useLang();
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState("");
   const [showAuth, setShowAuth] = useState(false);
+  const [showCreditModal, setShowCreditModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<{ name: string; content: string } | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { user } = useAuth();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { user, refreshProfile } = useAuth();
+
+  useEffect(() => {
+    refreshProfile();
+  }, []);
+
+  useEffect(() => {
+    if (isGenerating) {
+      setElapsedTime(0);
+      timerRef.current = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isGenerating]);
 
   const features = [
     { icon: <FileText size={20} />, label: t.typeSequence, desc: t.typeSequenceDesc, color: "#7c3aed" },
@@ -66,10 +91,16 @@ export function HeroSection() {
 
     setIsGenerating(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('未登录');
+      }
+
       const response = await fetch('/api/generate-diagram', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           prd: combinedContent
@@ -77,18 +108,34 @@ export function HeroSection() {
       });
 
       if (!response.ok) {
-        throw new Error('生成失败');
+        const error = await response.json();
+        console.error('API Error:', error);
+        const errorMsg = error.error || 'Generation failed';
+
+        if (errorMsg.includes('积分') || errorMsg.includes('credit') || errorMsg.includes('Insufficient')) {
+          setShowCreditModal(true);
+          return;
+        }
+
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
+      if (!data.code) {
+        throw new Error('API did not return mermaid code');
+      }
       sessionStorage.setItem('mermaidCode', data.code);
       navigate('/editor');
     } catch (error) {
-      console.error('生成失败:', error);
-      alert('生成图表失败，请重试');
+      console.error('Generation failed:', error);
+      alert(error instanceof Error ? error.message : 'Failed to generate diagram. Please try again.');
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuth(false);
   };
 
   return (
@@ -233,11 +280,37 @@ export function HeroSection() {
                   boxShadow: "0 4px 16px rgba(124,58,237,0.3)",
                 }}
               >
-                {isGenerating ? "生成中..." : t.heroCTA}
+                {isGenerating ? "Generating..." : t.heroCTA}
                 {!isGenerating && <ArrowRight size={16} />}
               </button>
             </div>
           </div>
+
+          {/* Progress bar */}
+          {isGenerating && (
+            <div className="mt-3 w-full">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs text-gray-500">AI is generating your diagram...</p>
+                <span className="text-xs font-mono text-purple-600">{elapsedTime}s</span>
+              </div>
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600"
+                  style={{
+                    width: '100%',
+                    backgroundSize: '200% 100%',
+                    animation: 'shimmer 2s linear infinite'
+                  }}
+                />
+              </div>
+              <style>{`
+                @keyframes shimmer {
+                  0% { background-position: 200% 0; }
+                  100% { background-position: -200% 0; }
+                }
+              `}</style>
+            </div>
+          )}
         </div>
 
         {/* Feature types */}
@@ -284,15 +357,49 @@ export function HeroSection() {
       <AuthModal
         isOpen={true}
         onClose={() => setShowAuth(false)}
-        onSuccess={() => {
-          setShowAuth(false);
-          if (prompt.trim()) {
-            navigate("/editor?prompt=" + encodeURIComponent(prompt.trim()));
-          } else {
-            navigate("/editor");
-          }
-        }}
+        onSuccess={handleAuthSuccess}
       />
+    )}
+
+    {showCreditModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl"
+        >
+          <div className="text-center">
+            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">💳</span>
+            </div>
+            <h3 className="text-2xl font-bold mb-2" style={{ color: "#1e0a3c" }}>
+              Insufficient Credits
+            </h3>
+            <p className="text-gray-600 mb-6">
+              You don't have enough credits to generate a diagram. Purchase more credits to continue.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCreditModal(false)}
+                className="flex-1 px-6 py-3 rounded-xl border-2 border-gray-200 font-semibold"
+                style={{ color: "#6b7280" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowCreditModal(false);
+                  navigate('/pricing');
+                }}
+                className="flex-1 px-6 py-3 rounded-xl font-semibold text-white"
+                style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
+              >
+                Buy Credits
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
     )}
     </>
   );

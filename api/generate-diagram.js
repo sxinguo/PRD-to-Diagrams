@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -14,6 +14,35 @@ export default async function handler(req, res) {
 
   try {
     const { prd } = req.body;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://aqdrywckvqrpuvaddsxj.supabase.co';
+    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxZHJ5d2NrdnFycHV2YWRkc3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzIwNTgsImV4cCI6MjA5NDc0ODA1OH0.mB7voJ7pT1LZ1iL9Rb3g5scm_CypmufPxb47t4sMmQ8';
+
+    // 扣积分（使用用户的 token，Supabase 会自动识别用户）
+    const deductResp = await fetch(`${supabaseUrl}/rest/v1/rpc/deduct_credits`, {
+      method: 'POST',
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        p_amount: 3,
+        p_description: '生成图表',
+      }),
+    });
+
+    if (!deductResp.ok) {
+      const error = await deductResp.json();
+      console.error('Deduct credits failed:', error);
+      return res.status(400).json({ error: error.message || error.hint || '积分不足' });
+    }
 
     console.log('[DEBUG] 接收到的 prd:', prd);
 
@@ -87,20 +116,19 @@ ${forcedType ? `必须生成 ${forcedType} 类型的代码。` : '根据需求�
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'MinMax API调用失败');
+      console.error('[MinMax API Error]:', data);
+      throw new Error(data.error?.message || 'AI service temporarily unavailable');
     }
 
     const textContent = data.content?.find(item => item.type === 'text');
     let mermaidCode = textContent?.text?.trim() || '';
 
     if (!mermaidCode) {
-      throw new Error('AI返回内容为空');
+      console.error('[Empty Response]:', data);
+      throw new Error('AI returned empty response. Please try again.');
     }
 
     mermaidCode = mermaidCode.replace(/```mermaid\n?/g, '').replace(/```\n?$/g, '').trim();
-
-    console.log('[API返回的mermaid代码]:', mermaidCode);
-    console.log('[代码类型]:', mermaidCode.split('\n')[0]);
 
     res.status(200).json({ code: mermaidCode });
   } catch (error) {

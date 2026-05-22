@@ -16,7 +16,6 @@ export function Navbar() {
     { label: t.navFeatures, href: "/#features", external: true },
     { label: t.navPricing, href: "/pricing", external: false },
     { label: t.navFAQ, href: "/faq", external: false },
-    { label: t.navBlog, href: "#blog", external: true },
   ];
 
   const isActive = (href: string) => href === "/pricing" && location.pathname === "/pricing";
@@ -94,6 +93,20 @@ export function Navbar() {
                   {profile?.credits_remaining ?? 0}
                 </span>
                 <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>积分</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: "#f5f3ff", border: "1px solid rgba(124,58,237,0.2)" }}>
+                {user.user_metadata?.avatar_url ? (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt="avatar"
+                    className="w-6 h-6 rounded-full"
+                  />
+                ) : (
+                  <User size={16} style={{ color: "#7c3aed" }} />
+                )}
+                <span style={{ color: "#7c3aed", fontSize: "0.875rem", fontWeight: 500 }}>
+                  {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                </span>
               </div>
               <button
                 onClick={signOut}
