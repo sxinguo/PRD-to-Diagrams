@@ -92,7 +92,7 @@ export function Navbar() {
                 <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: "0.875rem" }}>
                   {profile?.credits_remaining ?? 0}
                 </span>
-                <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>积分</span>
+                <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>Credits</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: "#f5f3ff", border: "1px solid rgba(124,58,237,0.2)" }}>
                 {user.user_metadata?.avatar_url ? (
