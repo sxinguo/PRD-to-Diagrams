@@ -100,6 +100,35 @@ const SYSTEM_PROMPT = String.raw`# Role
 app.post('/api/generate-diagram', async (req, res) => {
   try {
     const { prd } = req.body;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseUrl = process.env.SUPABASE_URL || 'https://aqdrywckvqrpuvaddsxj.supabase.co';
+    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxZHJ5d2NrdnFycHV2YWRkc3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzIwNTgsImV4cCI6MjA5NDc0ODA1OH0.mB7voJ7pT1LZ1iL9Rb3g5scm_CypmufPxb47t4sMmQ8';
+
+    // 扣积分
+    const deductResp = await fetch(`${supabaseUrl}/rest/v1/rpc/deduct_credits`, {
+      method: 'POST',
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        p_amount: 3,
+        p_description: '生成图表',
+      }),
+    });
+
+    if (!deductResp.ok) {
+      const error = await deductResp.json();
+      console.error('Deduct credits failed:', error);
+      return res.status(400).json({ error: error.message || error.hint || '积分不足' });
+    }
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 60000);

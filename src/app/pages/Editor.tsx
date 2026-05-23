@@ -639,54 +639,9 @@ export function EditorPage() {
 
     if (!combinedContent) return;
 
-    // 检查积分并扣减
-    if (user && profile) {
-      if (profile.credits_remaining < 3) {
-        alert("积分不足（当前 " + profile.credits_remaining + " 积分），请先购买积分");
-        return;
-      }
-
-      try {
-
-        const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token || ANON_KEY;
-        const userId = session?.user?.id || user.id;
-
-        if (!userId) {
-          alert("无法获取用户ID，请重新登录");
-          return;
-        }
-
-        const resp = await fetch(
-          `${SUPABASE_URL}/rest/v1/rpc/deduct_credits`,
-          {
-            method: "POST",
-            headers: {
-              "apikey": ANON_KEY,
-              "Authorization": `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user_id: userId,
-              amount: 3,
-              description: "AI生成图表",
-            }),
-          }
-        );
-
-
-        if (!resp.ok) {
-          const errText = await resp.text();
-          alert("扣积分失败: " + errText);
-          return;
-        }
-
-        const respText = await resp.text();
-        await refreshProfile();
-      } catch (err) {
-        alert("扣积分失败，请重试");
-        return;
-      }
+    if (user && profile && profile.credits_remaining < 3) {
+      alert("积分不足（当前 " + profile.credits_remaining + " 积分），请先购买积分");
+      return;
     }
 
     setIsAIGenerating(true);
@@ -717,6 +672,7 @@ export function EditorPage() {
       setIsAIGenerating(false);
       setShowAIChat(false);
       setAiPrompt("");
+      refreshProfile();
 
       // 自动渲染生成的代码
       await renderMermaid(generated);
