@@ -48,6 +48,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-8"
           style={{ borderTop: "1px solid rgba(124,58,237,0.08)" }}>
           <p className="text-xs" style={{ color: "#d1d5db" }}>{t.footerCopy}</p>
+          <p className="text-xs" style={{ color: "#9ca3af" }}>{t.footerContact}</p>
         </div>
       </div>
     </footer>

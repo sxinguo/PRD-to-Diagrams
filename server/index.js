@@ -58,7 +58,7 @@ const SYSTEM_PROMPT = String.raw`# Role
 仔细识别用户要求的图表类型，并严格使用对应的 Mermaid 语法标头（如果用户未指定，默认使用 flowchart TD）。
 1.  【时序图】：必须 sequenceDiagram 开头。
 2.  【流程图】：必须 flowchart TD (或 LR) 开头。
-3.  【泳道图】：必须 flowchart TD 开头，并用 subgraph 划分。
+3.  【泳道图】：必须 graph TD 开头，并用 subgraph 划分。
 4.  【用户体验地图】：必须 journey 开头。
 5.  【状态图】：必须 stateDiagram-v2 开头。
 
@@ -74,6 +74,19 @@ const SYSTEM_PROMPT = String.raw`# Role
 3.  **思维范式**：
     *   **错误思维**：用户 -> 点击A页面 -> A页面调用B功能。
     *   **正确思维**：Actor:用户 ->> 业务系统A: 发起操作请求 ->> 后台服务B: 处理核心逻辑 ->> 数据库: 持久化数据。
+
+# ⭐️ CRITICAL RULE 5: 【泳道图】的生成规范 (Role & System-based Swimlanes)
+泳道图最核心是展现业务流程逻辑（import！）。泳道代表的是一个独立的**职责边界**，而不是一个业务阶段或单一动作。
+1.  **识别真正的泳道**：subgraph 的标题必须是以下之一：
+    *   **角色/用户 (Role/Actor)**：如 患者, 医生, 客服。
+    *   **部门/团队 (Department)**：如 财务部, 运营团队, 风控组。
+    *   **系统/服务 (System/Service)**：如 订单系统, 支付网关, HIS系统。
+2.  **禁止错误定义**：严禁将以下内容作为 subgraph 标题：
+    *   **禁止**：业务流程阶段 (如”需求评审”、”开发测试”)。
+    *   **禁止**：单一动作或功能 (如”提交申请”、”数据校验”)。
+3.  **思维范式**:
+    *   **错误思维 (流程为泳道)**: subgraph 提交申请 --> subgraph 客服审核。
+    *   **正确思维 (角色/系统为泳道)**: 流程在泳道之间流转。subgraph 用户 内有节点 “提交申请”；subgraph 客服系统 内有节点 “后台审核”；然后用箭头连接这两个节点。
 
 # 🚫 Strict Output Constraints
 1.  **绝对闭嘴**：禁止输出任何问候语、确认语、分析过程或解释说明。
@@ -143,6 +156,66 @@ app.post('/api/generate-diagram', async (req, res) => {
     res.json({ code: mermaidCode });
   } catch (error) {
     console.error('生成图表失败:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '';
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+app.post('/api/verify-turnstile', async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ success: false, error: 'token不能为空' });
+    }
+
+    const verification = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        secret: TURNSTILE_SECRET_KEY,
+        response: token,
+      }),
+    });
+
+    if (!verification.ok) {
+      throw new Error('Turnstile验证请求失败');
+    }
+
+    const result = await verification.json();
+    return res.json({ success: result.success });
+  } catch (error) {
+    console.error('Turnstile验证失败:', error);
+    res.status(200).json({ success: false });
+  }
+});
+
+app.post('/api/check-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: '邮箱不能为空' });
+    }
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        'apikey': SUPABASE_SERVICE_ROLE_KEY,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('查询用户失败');
+    }
+
+    const data = await response.json();
+    const userExists = (data.users || []).some(u => u.email.toLowerCase() === email.toLowerCase());
+
+    res.json({ exists: userExists });
+  } catch (error) {
+    console.error('检查邮箱失败:', error);
     res.status(500).json({ error: error.message });
   }
 });

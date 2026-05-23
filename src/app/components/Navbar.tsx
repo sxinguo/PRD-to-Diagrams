@@ -38,7 +38,7 @@ export function Navbar() {
             <FileText size={16} color="#fff" />
           </div>
           <span style={{ color: "#1e0a3c", fontWeight: 700, letterSpacing: "-0.02em" }}>
-            Chart<span style={{ color: "#7c3aed" }}>PRD</span>
+            <span style={{ color: "#7c3aed" }}>PRD</span><span style={{ color: "#1e0a3c" }}>-Chart</span>
           </span>
         </Link>
 

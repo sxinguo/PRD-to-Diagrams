@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import { X, Mail, Chrome } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+
+const TURNSTILE_SITE_KEY = "0x4AAAAAADUuGmSEMunFfR85";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -16,6 +18,45 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [loading, setLoading] = useState(false);
   const [isOAuthPending, setIsOAuthPending] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReady, setTurnstileReady] = useState(false);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scriptId = "turnstile-script";
+    if (document.getElementById(scriptId)) {
+      setTurnstileReady(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => setTurnstileReady(true);
+    document.head.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    if (!turnstileReady || !turnstileRef.current) return;
+
+    const container = turnstileRef.current;
+    if (container.innerHTML) return;
+
+    const widgetId = (window as any).turnstile.render(container, {
+      sitekey: TURNSTILE_SITE_KEY,
+      theme: "light",
+      callback: (token: string) => setTurnstileToken(token),
+      "expired-callback": () => setTurnstileToken(null),
+      "error-callback": () => setTurnstileToken(null),
+    });
+
+    return () => {
+      try {
+        (window as any).turnstile.remove(widgetId);
+      } catch {}
+    };
+  }, [turnstileReady]);
 
   if (!isOpen) return null;
 
@@ -26,16 +67,87 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
     try {
       if (mode === "signup") {
+        if (!turnstileToken) {
+          setMessage({ type: "error", text: "请先完成人机验证" });
+          setLoading(false);
+          return;
+        }
+        const verifyRes = await fetch('http://localhost:3001/api/verify-turnstile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: turnstileToken }),
+        });
+        if (!verifyRes.ok) {
+          setMessage({ type: "error", text: "人机验证服务暂时不可用，请稍后再试" });
+          setLoading(false);
+          return;
+        }
+        const verifyData = await verifyRes.json();
+        if (!verifyData.success) {
+          setMessage({ type: "error", text: "人机验证失败，请重新验证" });
+          setLoading(false);
+          return;
+        }
+        const checkRes = await fetch('http://localhost:3001/api/check-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        if (!checkRes.ok) {
+          setMessage({ type: "error", text: "注册服务暂时不可用，请稍后再试" });
+          setLoading(false);
+          return;
+        }
+        const checkData = await checkRes.json();
+        if (checkData.exists) {
+          setMessage({ type: "error", text: "该邮箱已注册，请直接登录" });
+          setLoading(false);
+          return;
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            captchaToken: turnstileToken,
+          },
         });
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes("already been registered") || error.message.includes("already exists") || error.code === "23505") {
+            setMessage({ type: "error", text: "该邮箱已注册，请直接登录或使用其他邮箱" });
+            setLoading(false);
+            return;
+          }
+          throw error;
+        }
         setMessage({ type: "success", text: "注册成功！请查看邮箱验证链接。" });
       } else {
+        if (!turnstileToken) {
+          setMessage({ type: "error", text: "请先完成人机验证" });
+          setLoading(false);
+          return;
+        }
+        const verifyRes = await fetch('http://localhost:3001/api/verify-turnstile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: turnstileToken }),
+        });
+        if (!verifyRes.ok) {
+          setMessage({ type: "error", text: "人机验证服务暂时不可用，请稍后再试" });
+          setLoading(false);
+          return;
+        }
+        const verifyData = await verifyRes.json();
+        if (!verifyData.success) {
+          setMessage({ type: "error", text: "人机验证失败，请重新验证" });
+          setLoading(false);
+          return;
+        }
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
+          options: {
+            captchaToken: turnstileToken,
+          },
         });
         if (error) throw error;
         onSuccess();
@@ -172,6 +284,8 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               {message.text}
             </div>
           )}
+
+          <div ref={turnstileRef} className="flex justify-center" />
 
           <button
             type="submit"
