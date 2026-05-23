@@ -14,6 +14,7 @@ interface PayPalButtonProps {
   planType: "basic" | "pro" | "credits_pack";
   amount: string;
   credits?: number;
+  isYearly?: boolean;
   onSuccess?: (orderId: string) => void;
   onError?: (err: any) => void;
   onCancel?: () => void;
@@ -40,11 +41,20 @@ const PLAN_CONFIG = {
   },
 };
 
-export function PayPalButton({ planType, amount, credits = 0, onSuccess, onError, onCancel }: PayPalButtonProps) {
+const YEARLY_CREDITS_MULTIPLIER = 12;
+
+function getPlanCredits(planType: "basic" | "pro" | "credits_pack", isYearly: boolean): number {
+  const base = PLAN_CONFIG[planType]?.credits || 100;
+  return isYearly ? base * YEARLY_CREDITS_MULTIPLIER : base;
+}
+
+export function PayPalButton({ planType, amount, credits = 0, isYearly = false, onSuccess, onError, onCancel }: PayPalButtonProps) {
   const paypalRef = useRef<HTMLDivElement>(null);
   const config = PLAN_CONFIG[planType];
   const { user, session } = useAuth();
   const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
+  const yearlyCredits = getPlanCredits(planType, isYearly);
+  const desc = isYearly ? `${config.description}（12个月订阅）` : config.description;
 
   useEffect(() => {
     if (!clientId) {
@@ -69,7 +79,7 @@ export function PayPalButton({ planType, amount, credits = 0, onSuccess, onError
               return actions.order.create({
                 purchase_units: [
                   {
-                    description: config.description,
+                    description: desc,
                     amount: {
                       value: amount || config.price,
                     },
@@ -96,7 +106,7 @@ export function PayPalButton({ planType, amount, credits = 0, onSuccess, onError
                   order_id: order.id,
                   user_id: user.id,
                   plan_type: planType,
-                  credits_granted: credits || config.credits,
+                  credits_granted: yearlyCredits,
                 }));
 
                 const resp = await fetch(
@@ -111,7 +121,7 @@ export function PayPalButton({ planType, amount, credits = 0, onSuccess, onError
                       order_id: order.id,
                       user_id: user.id,
                       plan_type: planType,
-                      credits_granted: credits || config.credits,
+                      credits_granted: yearlyCredits,
                     }),
                   }
                 );
@@ -154,7 +164,7 @@ export function PayPalButton({ planType, amount, credits = 0, onSuccess, onError
     return () => {
       // cleanup
     };
-  }, [amount, config.description, config.price, config.credits, onCancel, onError, onSuccess, planType, user, session, credits]);
+  }, [amount, desc, yearlyCredits, onCancel, onError, onSuccess, planType, user, session]);
 
   if (!clientId) {
     return (

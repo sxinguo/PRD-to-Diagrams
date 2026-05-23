@@ -12,10 +12,11 @@ interface PaymentModalProps {
   planType: "basic" | "pro" | "credits_pack";
   planName: string;
   price: string;
+  isYearly: boolean;
   onPaymentSuccess?: () => void;
 }
 
-function PaymentModal({ isOpen, onClose, planType, planName, price, onPaymentSuccess }: PaymentModalProps) {
+function PaymentModal({ isOpen, onClose, planType, planName, price, isYearly, onPaymentSuccess }: PaymentModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -40,13 +41,15 @@ function PaymentModal({ isOpen, onClose, planType, planName, price, onPaymentSuc
           {planName}
         </h3>
         <p style={{ color: "#6b7280", marginBottom: "24px" }}>
-          价格: <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: "1.25rem" }}>${price}/月</span>
+          价格: <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: "1.25rem" }}>${price}</span>
+          {isYearly && <span style={{ color: "#9ca3af", fontSize: "0.85rem" }}>（12个月总计）</span>}
         </p>
 
         <div style={{ marginBottom: "16px" }}>
           <PayPalButton
             planType={planType}
             amount={price}
+            isYearly={isYearly}
             onSuccess={(orderId) => {
               console.log("Payment success:", orderId);
               onPaymentSuccess?.();
@@ -88,6 +91,7 @@ export function Pricing() {
     type: "basic" | "pro" | "credits_pack";
     name: string;
     price: string;
+    isYearly: boolean;
   } | null>(null);
   const { t, lang } = useLang();
   const { user, refreshProfile } = useAuth();
@@ -133,11 +137,13 @@ export function Pricing() {
       setShowAuth(true);
       return;
     }
-    const price = yearly ? plan.price.yearly : plan.price.monthly;
+    const monthlyPrice = yearly ? parseFloat(plan.price.yearly) : parseFloat(plan.price.monthly);
+    const yearlyTotal = yearly ? (monthlyPrice * 12).toFixed(2) : plan.price.monthly;
     setSelectedPlan({
       type: (plan as any).type || "credits_pack",
       name: plan.name,
-      price: String(price),
+      price: String(yearlyTotal),
+      isYearly: yearly,
     });
     setShowPayment(true);
   };
@@ -285,6 +291,7 @@ export function Pricing() {
           planType={selectedPlan.type}
           planName={selectedPlan.name}
           price={selectedPlan.price}
+          isYearly={selectedPlan.isYearly}
           onPaymentSuccess={() => refreshProfile()}
         />
       )}

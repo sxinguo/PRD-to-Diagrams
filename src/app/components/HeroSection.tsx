@@ -171,12 +171,6 @@ export function HeroSection() {
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="relative z-10 flex flex-col items-center text-center max-w-4xl w-full"
       >
-        {/* Badge */}
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full mb-6"
-          style={{ background: "#f5f3ff", border: "1px solid rgba(124,58,237,0.2)" }}>
-          <span className="text-xs" style={{ color: "#6d28d9" }}>{t.heroBadge}</span>
-        </div>
-
         {/* Headline */}
         <h1 style={{
           fontSize: "clamp(2.4rem, 6vw, 4.4rem)",
@@ -215,7 +209,7 @@ export function HeroSection() {
               }}
               placeholder={t.heroPlaceholder}
               className="w-full px-5 rounded-2xl resize-none focus:outline-none"
-              rows={5}
+              rows={6}
               style={{
                 background: "#fff",
                 border: "1.5px solid rgba(124,58,237,0.15)",
@@ -226,6 +220,7 @@ export function HeroSection() {
                 fontFamily: "'Inter', -apple-system, sans-serif",
                 paddingTop: uploadedFile ? "3rem" : "1rem",
                 paddingBottom: "1rem",
+                paddingRight: "8px",
               }}
             />
 

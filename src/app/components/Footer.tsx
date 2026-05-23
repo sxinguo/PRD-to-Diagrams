@@ -5,10 +5,8 @@ export function Footer() {
   const { t } = useLang();
 
   const links = [
-    { label: t.navBlog, href: "#" },
     { label: t.navPrivacyPolicy, href: "/privacy-policy" },
     { label: t.navFeatures, href: "#" },
-    { label: t.navTerms, href: "#" },
     { label: t.navPricing, href: "/pricing" },
     { label: t.navRefundPolicy, href: "/refund-policy" },
   ];
@@ -26,7 +24,7 @@ export function Footer() {
                 <FileText size={16} color="#fff" />
               </div>
               <span style={{ color: "#1e0a3c", fontWeight: 700 }}>
-                Chart<span style={{ color: "#7c3aed" }}>PRD</span>
+                PRD<span style={{ color: "#7c3aed" }}>-Chart</span>
               </span>
             </div>
             <p className="text-xs" style={{ color: "#9ca3af", lineHeight: 1.7 }}>
@@ -50,7 +48,6 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-8"
           style={{ borderTop: "1px solid rgba(124,58,237,0.08)" }}>
           <p className="text-xs" style={{ color: "#d1d5db" }}>{t.footerCopy}</p>
-          <p className="text-xs" style={{ color: "#d1d5db" }}>{t.footerNote}</p>
         </div>
       </div>
     </footer>

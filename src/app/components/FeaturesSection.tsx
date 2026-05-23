@@ -43,12 +43,8 @@ export function FeaturesSection() {
       style={{ background: "#fff" }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-14">
-          <div className="inline-block px-3 py-1 rounded-full text-xs mb-4"
-            style={{ background: "#ede9fe", border: "1px solid rgba(124,58,237,0.2)", color: "#7c3aed" }}>
-            {t.featuresBadge}
-          </div>
-          <h2 style={{ color: "#1e0a3c", letterSpacing: "-0.03em", marginBottom: 12 }}>
+        <div className="text-center mb-12">
+          <h2 style={{ color: "#1e0a3c", letterSpacing: "-0.03em", marginBottom: 10 }}>
             {t.featuresH2a}<br />
             <span style={{
               background: "linear-gradient(135deg, #7c3aed, #a855f7)",

@@ -266,7 +266,7 @@ export function EditorPage() {
   }, [viewMode, isPanning]);
 
   useEffect(() => {
-    const container = imageContainerRef.current;
+    const container = previewContainerRef.current;
     if (!container) return;
 
     let initialDistance = 0;
@@ -724,21 +724,21 @@ export function EditorPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#f5f3ff", height: "100vh" }}>
+    <div className="flex flex-col" style={{ background: "#f5f3ff", height: "100dvh", overflow: "hidden" }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-3"
+      <div className="flex items-center justify-between px-6 py-3 shrink-0"
         style={{ background: "#fff", borderBottom: "1px solid rgba(124,58,237,0.1)" }}>
-        <div className="flex items-center gap-4">
-          <span style={{ fontWeight: 700, color: "#1e0a3c", fontSize: "1.1rem" }}>PRD图示</span>
+        <div className="flex items-center gap-0">
+          <span style={{ fontWeight: 700, color: "#7c3aed", fontSize: "1.1rem" }}>PRD</span><span style={{ fontWeight: 700, color: "#1e0a3c", fontSize: "1.1rem" }}>-Chart</span>
           <span style={{ color: "#9ca3af" }}>/</span>
           <span style={{ color: "#6b7280" }}>Editor</span>
         </div>
       </div>
 
       {/* Main content: 30% editor / 70% preview */}
-      <div className="flex-1 flex" style={{ overflow: "hidden", background: "#f5f3ff" }}>
+      <div className="flex flex-1 shrink-0" style={{ overflow: "hidden", background: "#f5f3ff", minHeight: 0 }}>
         {/* Left: Monaco Editor (30%) */}
-        <div className="flex flex-col border-r"
+        <div className="flex flex-col border-r shrink-0"
           style={{ width: "30%", borderColor: "rgba(124,58,237,0.1)", background: "#fafbff", height: "100%" }}>
           {/* Editor toolbar */}
           <div className="flex items-center justify-between px-4 py-2"
@@ -763,7 +763,7 @@ export function EditorPage() {
             </div>
           </div>
           {/* Monaco Editor */}
-          <div className="flex-1" style={{ position: "relative" }}>
+          <div className="flex-1" style={{ position: "relative", minHeight: 0 }}>
             <MonacoEditor
               height="100%"
               defaultLanguage="markdown"
@@ -790,7 +790,7 @@ export function EditorPage() {
             />
           </div>
           {/* Bottom bar */}
-          <div className="flex items-center justify-between gap-3 px-4 py-3"
+          <div className="flex items-center justify-between gap-3 px-4 py-3 shrink-0"
             style={{ background: "#fafbff", borderTop: "1px solid rgba(124,58,237,0.08)" }}>
             <button onClick={() => setShowAIChat(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
@@ -832,9 +832,10 @@ export function EditorPage() {
         {/* Right: Preview (60%) */}
         <div className="flex-1 flex flex-col" style={{
           background: "#ffffff",
-          backgroundImage: "radial-gradient(circle, rgba(124,58,237,0.03) 1px, transparent 1px)",
-          backgroundSize: "20px 20px",
-          position: "relative"
+          backgroundImage: "radial-gradient(circle, rgba(124,58,237,0.20) 1.3px, transparent 1.3px)",
+          backgroundSize: "24px 24px",
+          position: "relative",
+          minHeight: 0
         }}>
           {/* Preview toolbar */}
           <div className="flex items-center justify-between px-4 py-2"
@@ -919,7 +920,7 @@ export function EditorPage() {
           {/* Diagram preview area */}
           <div
             ref={previewContainerRef}
-            className="flex-1 p-6 overflow-hidden"
+            className="flex-1 p-6 overflow-auto"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -929,8 +930,9 @@ export function EditorPage() {
               userSelect: 'none',
               cursor: isPanning ? 'grabbing' : (viewMode ? 'grab' : 'default'),
               background: "#ffffff",
-              backgroundImage: "radial-gradient(circle, rgba(124,58,237,0.03) 1px, transparent 1px)",
-              backgroundSize: "20px 20px"
+              backgroundImage: "radial-gradient(circle, rgba(124,58,237,0.20) 1.3px, transparent 1.3px)",
+              backgroundSize: "24px 24px",
+              minHeight: 0
             }}
           >
             {isProcessing ? (
