@@ -693,10 +693,13 @@ export function EditorPage() {
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token || ANON_KEY;
       const response = await fetch(`${apiUrl}/generate-diagram`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           prd: combinedContent,
