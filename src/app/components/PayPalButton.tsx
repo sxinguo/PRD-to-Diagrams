@@ -79,6 +79,7 @@ export function PayPalButton({ planType, amount, credits = 0, isYearly = false, 
               return actions.order.create({
                 purchase_units: [
                   {
+                    custom_id: user ? `${user.id}|${planType}|${yearlyCredits}` : undefined,
                     description: desc,
                     amount: {
                       value: amount || config.price,
