@@ -68,7 +68,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     try {
       if (mode === "signup") {
         if (!turnstileToken) {
-          setMessage({ type: "error", text: "请先完成人机验证" });
+          setMessage({ type: "error", text: "Please complete the verification first" });
           setLoading(false);
           return;
         }
@@ -78,13 +78,13 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           body: JSON.stringify({ token: turnstileToken }),
         });
         if (!verifyRes.ok) {
-          setMessage({ type: "error", text: "人机验证服务暂时不可用，请稍后再试" });
+          setMessage({ type: "error", text: "Verification service unavailable, please try again later" });
           setLoading(false);
           return;
         }
         const verifyData = await verifyRes.json();
         if (!verifyData.success) {
-          setMessage({ type: "error", text: "人机验证失败，请重新验证" });
+          setMessage({ type: "error", text: "Verification failed, please try again" });
           setLoading(false);
           return;
         }
@@ -94,13 +94,13 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           body: JSON.stringify({ email }),
         });
         if (!checkRes.ok) {
-          setMessage({ type: "error", text: "注册服务暂时不可用，请稍后再试" });
+          setMessage({ type: "error", text: "Registration service unavailable, please try again later" });
           setLoading(false);
           return;
         }
         const checkData = await checkRes.json();
         if (checkData.exists) {
-          setMessage({ type: "error", text: "该邮箱已注册，请直接登录" });
+          setMessage({ type: "error", text: "This email is already registered, please sign in" });
           setLoading(false);
           return;
         }
@@ -113,16 +113,16 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         });
         if (error) {
           if (error.message.includes("already been registered") || error.message.includes("already exists") || error.code === "23505") {
-            setMessage({ type: "error", text: "该邮箱已注册，请直接登录或使用其他邮箱" });
+            setMessage({ type: "error", text: "This email is already registered, please sign in or use another email" });
             setLoading(false);
             return;
           }
           throw error;
         }
-        setMessage({ type: "success", text: "注册成功！请查看邮箱验证链接。" });
+        setMessage({ type: "success", text: "Registration successful! Please check your email for the verification link." });
       } else {
         if (!turnstileToken) {
-          setMessage({ type: "error", text: "请先完成人机验证" });
+          setMessage({ type: "error", text: "Please complete the verification first" });
           setLoading(false);
           return;
         }
@@ -132,13 +132,13 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           body: JSON.stringify({ token: turnstileToken }),
         });
         if (!verifyRes.ok) {
-          setMessage({ type: "error", text: "人机验证服务暂时不可用，请稍后再试" });
+          setMessage({ type: "error", text: "Verification service unavailable, please try again later" });
           setLoading(false);
           return;
         }
         const verifyData = await verifyRes.json();
         if (!verifyData.success) {
-          setMessage({ type: "error", text: "人机验证失败，请重新验证" });
+          setMessage({ type: "error", text: "Verification failed, please try again" });
           setLoading(false);
           return;
         }
@@ -154,7 +154,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         onClose();
       }
     } catch (error: any) {
-      setMessage({ type: "error", text: error.message || "操作失败" });
+      setMessage({ type: "error", text: error.message || "Operation failed" });
     } finally {
       setLoading(false);
     }
@@ -176,7 +176,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
       });
       if (error) throw error;
     } catch (error: any) {
-      setMessage({ type: "error", text: error.message || "Google登录失败" });
+      setMessage({ type: "error", text: error.message || "Google sign in failed" });
     } finally {
       setIsOAuthPending(false);
     }
@@ -203,7 +203,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#1e0a3c" }}>
-            {mode === "login" ? "登录账号" : "注册账号"}
+            {mode === "login" ? "Sign In" : "Sign Up"}
           </h2>
           <button
             onClick={onClose}
@@ -231,7 +231,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
             <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
           </svg>
-          <span style={{ fontWeight: 500, color: "#374151" }}>使用 Google 登录</span>
+          <span style={{ fontWeight: 500, color: "#374151" }}>Sign in with Google</span>
         </button>
 
         {/* Divider */}
@@ -246,7 +246,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           <div>
             <input
               type="email"
-              placeholder="邮箱地址"
+              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -260,7 +260,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           <div>
             <input
               type="password"
-              placeholder="密码"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -296,13 +296,13 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               cursor: loading || isOAuthPending ? "not-allowed" : "pointer",
             }}
           >
-            {loading ? "处理中..." : isOAuthPending ? "跳转中..." : mode === "login" ? "登录" : "注册"}
+            {loading ? "Processing..." : isOAuthPending ? "Redirecting..." : mode === "login" ? "Sign In" : "Sign Up"}
           </button>
         </form>
 
         {/* Toggle Mode */}
         <p className="text-center mt-4" style={{ fontSize: "0.9rem", color: "#6b7280" }}>
-          {mode === "login" ? "还没有账号？" : "已有账号？"}
+          {mode === "login" ? "Don't have an account?" : "Already have an account?"}
           <button
             onClick={() => {
               setMode(mode === "login" ? "signup" : "login");
@@ -311,7 +311,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             className="ml-1 font-semibold"
             style={{ color: "#7c3aed" }}
           >
-            {mode === "login" ? "立即注册" : "立即登录"}
+            {mode === "login" ? "Sign Up" : "Sign In"}
           </button>
         </p>
       </motion.div>
