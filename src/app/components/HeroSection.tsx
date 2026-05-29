@@ -107,10 +107,17 @@ export function HeroSection() {
         })
       });
 
+      const raw = await response.text();
+
       if (!response.ok) {
-        const error = await response.json();
-        console.error('API Error:', error);
-        const errorMsg = error.error || 'Generation failed';
+        let errorMsg = 'Generation failed';
+        try {
+          const error = JSON.parse(raw);
+          errorMsg = error.error || error.message || 'Generation failed';
+        } catch {
+          errorMsg = raw || 'Generation failed';
+        }
+        console.error('API Error:', errorMsg);
 
         if (errorMsg.includes('积分') || errorMsg.includes('credit') || errorMsg.includes('Insufficient')) {
           setShowCreditModal(true);
@@ -120,7 +127,7 @@ export function HeroSection() {
         throw new Error(errorMsg);
       }
 
-      const data = await response.json();
+      const data = JSON.parse(raw);
       if (!data.code) {
         throw new Error('API did not return mermaid code');
       }

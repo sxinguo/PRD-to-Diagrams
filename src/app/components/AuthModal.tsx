@@ -72,7 +72,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           setLoading(false);
           return;
         }
-        const verifyRes = await fetch('http://localhost:3001/api/verify-turnstile', {
+        const verifyRes = await fetch('/api/verify-turnstile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token: turnstileToken }),
@@ -88,7 +88,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           setLoading(false);
           return;
         }
-        const checkRes = await fetch('http://localhost:3001/api/check-email', {
+        const checkRes = await fetch('/api/check-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
@@ -126,7 +126,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           setLoading(false);
           return;
         }
-        const verifyRes = await fetch('http://localhost:3001/api/verify-turnstile', {
+        const verifyRes = await fetch('/api/verify-turnstile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token: turnstileToken }),

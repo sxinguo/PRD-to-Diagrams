@@ -674,8 +674,9 @@ export function EditorPage() {
       setAiPrompt("");
       refreshProfile();
 
-      // 自动渲染生成的代码
+      // 自动渲染并更新状态
       await renderMermaid(generated);
+      setIsDone(true);
     } catch (error) {
       alert('生成图表失败，请重试');
       setIsAIGenerating(false);

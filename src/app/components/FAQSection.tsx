@@ -40,7 +40,7 @@ const faqs = {
     },
     {
       question: "Is there a free trial?",
-      answer: "Yes, you get 6 free credits upon registration. Plus, if you use the service daily, you'll receive 3 bonus credits every day."
+      answer: "Yes, you get 12 free credits upon registration. Plus, if you use the service daily, you'll receive 3 bonus credits every day."
     },
   ],
   zh: [
@@ -74,7 +74,7 @@ const faqs = {
     },
     {
       question: "有免费试用吗？",
-      answer: "有，注册即送 6 积分。此外，每天使用完还可领取 3 积分奖励。"
+      answer: "有，注册即送 12 积分。此外，每天使用完还可领取 3 积分奖励。"
     },
   ],
 };

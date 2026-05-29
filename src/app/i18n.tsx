@@ -88,7 +88,7 @@ export const translations = {
     save: "Save 20%",
     pricingNote: "Credits never expire. SSL encrypted. 14-day refund guarantee.",
     planFree: "Free",
-    planFreeDesc: "Get started with 6 free credits",
+    planFreeDesc: "Get started with 12 free credits",
     planStarter: "Starter Pack",
     planStarterDesc: "100 credits for casual use",
     planPro: "Pro Pack",
@@ -98,7 +98,7 @@ export const translations = {
     ctaStarter: "Buy Starter Pack",
     ctaPro: "Buy Pro Pack",
     perMonth: "",
-    f_6credits: "6 free credits on signup",
+    f_6credits: "12 free credits on signup",
     f_3perGen: "3 credits per generation",
     f_dailyBonus: "Daily bonus: +3 if used yesterday",
     f_100credits: "100 credits pack",
@@ -113,7 +113,7 @@ export const translations = {
     // Footer
     footerTagline: "AI-powered PRD to diagram conversion for product managers.",
     footerNote: "Built with neural precision · Powered by AI",
-    footerCopy: "© 2026 ChartPRD Inc. All rights reserved.",
+    footerCopy: "© 2026 PRD Chart Inc. All rights reserved.",
     footerContact: "Contact us: feedback9980@163.com",
     colProduct: "Product",
     colCompany: "Company",
@@ -124,7 +124,7 @@ export const translations = {
     navRefundPolicy: "Refund Policy",
 
     // Meta
-    pageTitle: "ChartPRD - AI-Powered PRD to Diagram Converter",
+    pageTitle: "PRD Chart - AI-Powered PRD to Diagram Converter",
     pageDescription: "Upload your PRD and instantly generate sequence diagrams, flowcharts, and user journey maps. Built for product managers.",
   },
   zh: {
@@ -207,7 +207,7 @@ export const translations = {
     save: "节省 20%",
     pricingNote: "积分永不过期 · SSL 加密 · 14 天无理由退款",
     planFree: "免费版",
-    planFreeDesc: "注册即送 6 积分，每天用完可领 3 积分",
+    planFreeDesc: "注册即送 12 积分，每天用完可领 3 积分",
     planStarter: "入门包",
     planStarterDesc: "100 积分，适合轻度使用",
     planPro: "专业包",
@@ -217,7 +217,7 @@ export const translations = {
     ctaStarter: "购买入门包",
     ctaPro: "购买专业包",
     perMonth: "",
-    f_6credits: "注册即送 6 积分",
+    f_6credits: "注册即送 12 积分",
     f_3perGen: "每次生成消耗 3 积分",
     f_dailyBonus: "每天用完可领 +3 积分",
     f_100credits: "100 积分包",

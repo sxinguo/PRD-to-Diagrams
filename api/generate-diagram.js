@@ -124,8 +124,9 @@ ${forcedType ? `必须生成 ${forcedType} 类型的代码。` : '根据需求�
         const textContent = data.content?.find(item => item.type === 'text');
         let mermaidCode = textContent?.text?.trim() || '';
 
-        if (!mermaidCode) {
-          console.error('[Empty Response]:', data);
+        // MiniMax may return 'thinking' type when response is truncated (max_tokens)
+        if (!mermaidCode && data.content?.length > 0) {
+          console.error('[Empty Response]:', JSON.stringify(data).slice(0, 500));
           throw new Error('AI returned empty response');
         }
 

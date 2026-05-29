@@ -264,12 +264,12 @@ export function Pricing() {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {(lang === "zh" ? [
-              { q: "积分是如何计算的？", a: "每次生成图表消耗 3 积分。注册即送 6 积分，每天用完后可再领 3 积分。" },
+              { q: "积分是如何计算的？", a: "每次生成图表消耗 3 积分。注册即送 12 积分，每天用完后可再领 3 积分。" },
               { q: "积分会过期吗？", a: "购买的积分永不过期，可随时使用。免费赠送的积分每个月初重置。" },
               { q: "如何获得更多积分？", a: "购买积分包即可获得更多积分，购买的积分永久有效。" },
               { q: "支持哪些支付方式？", a: "目前支持 PayPal 支付，信用卡也可通过 PayPal 完成付款。" },
             ] : [
-              { q: "How are credits calculated?", a: "Each diagram generation costs 3 credits. Sign up for 6 free credits, and earn 3 more daily after you use them." },
+              { q: "How are credits calculated?", a: "Each diagram generation costs 3 credits. Sign up for 12 free credits, and earn 3 more daily after you use them." },
               { q: "Do credits expire?", a: "Purchased credits never expire. Free daily credits reset at the start of each month." },
               { q: "How to get more credits?", a: "Purchase a credit pack anytime. Purchased credits are valid permanently." },
               { q: "What payment methods are supported?", a: "Currently PayPal is supported. Credit cards can also be used via PayPal." },
