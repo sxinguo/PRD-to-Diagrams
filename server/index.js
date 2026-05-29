@@ -132,16 +132,15 @@ app.post('/api/generate-diagram', async (req, res) => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 60000);
 
-    const response = await fetch('https://api.minimaxi.com/anthropic/v1/messages', {
+    const response = await fetch('https://yunwu.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Api-Key': process.env.MINMAX_API_KEY,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${process.env.MINMAX_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2048,
+        model: 'gemini-3.5-flash',
+        max_tokens: 8192,
         messages: [
           {
             role: 'user',
@@ -160,19 +159,7 @@ app.post('/api/generate-diagram', async (req, res) => {
     }
 
     // 提取 Mermaid 代码
-    let textContent = data.content?.find(item => item.type === 'text');
-
-    if (!textContent && data.content?.length > 0) {
-      const thinkingContent = data.content.find(item => item.type === 'thinking');
-      if (thinkingContent?.thinking) {
-        const match = thinkingContent.thinking.match(/```(?:mermaid)?\n([\s\S]*?)```/);
-        if (match) {
-          textContent = { text: match[1] };
-        }
-      }
-    }
-
-    let mermaidCode = textContent?.text?.trim() || '';
+    let mermaidCode = data.choices?.[0]?.message?.content?.trim() || '';
 
     if (!mermaidCode) {
       throw new Error('AI返回内容为空');

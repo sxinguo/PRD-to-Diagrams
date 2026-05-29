@@ -95,16 +95,15 @@ ${forcedType ? `必须生成 ${forcedType} 类型的代码。` : '根据需求�
       try {
         console.log(`[Attempt ${attempt}/${maxRetries}] Calling MinMax API...`);
 
-        const response = await fetch('https://api.minimaxi.com/anthropic/v1/messages', {
+        const response = await fetch('https://yunwu.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Api-Key': process.env.MINMAX_API_KEY,
-            'anthropic-version': '2023-06-01'
+            'Authorization': `Bearer ${process.env.MINMAX_API_KEY}`
           },
           body: JSON.stringify({
-            model: 'claude-3-5-sonnet-20241022',
-            max_tokens: 2048,
+            model: 'gemini-3.5-flash',
+            max_tokens: 8192,
             messages: [
               {
                 role: 'user',
@@ -117,15 +116,13 @@ ${forcedType ? `必须生成 ${forcedType} 类型的代码。` : '根据需求�
         const data = await response.json();
 
         if (!response.ok) {
-          console.error('[MinMax API Error]:', data);
+          console.error('[Yunwu API Error]:', data);
           throw new Error(data.error?.message || 'AI service temporarily unavailable');
         }
 
-        const textContent = data.content?.find(item => item.type === 'text');
-        let mermaidCode = textContent?.text?.trim() || '';
+        const mermaidCode = data.choices?.[0]?.message?.content?.trim() || '';
 
-        // MiniMax may return 'thinking' type when response is truncated (max_tokens)
-        if (!mermaidCode && data.content?.length > 0) {
+        if (!mermaidCode) {
           console.error('[Empty Response]:', JSON.stringify(data).slice(0, 500));
           throw new Error('AI returned empty response');
         }
