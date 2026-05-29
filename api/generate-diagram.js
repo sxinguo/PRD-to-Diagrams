@@ -120,7 +120,7 @@ ${forcedType ? `必须生成 ${forcedType} 类型的代码。` : '根据需求�
           throw new Error(data.error?.message || 'AI service temporarily unavailable');
         }
 
-        const mermaidCode = data.choices?.[0]?.message?.content?.trim() || '';
+        let mermaidCode = data.choices?.[0]?.message?.content?.trim() || '';
 
         if (!mermaidCode) {
           console.error('[Empty Response]:', JSON.stringify(data).slice(0, 500));
