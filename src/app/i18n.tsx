@@ -126,6 +126,26 @@ export const translations = {
     // Meta
     pageTitle: "PRD Chart - AI-Powered PRD to Diagram Converter",
     pageDescription: "Upload your PRD and instantly generate sequence diagrams, flowcharts, and user journey maps. Built for product managers.",
+
+    // Editor AI Modal
+    aiModalTitle: "AI Generate Diagram",
+    aiModalDesc: "Describe what diagram you want to create",
+    aiModalPlaceholder: "e.g., User login flow with phone verification and OTP",
+    aiUploadDoc: "Upload Document",
+    aiCancel: "Cancel",
+    aiGenerate: "Generate",
+    aiGenerating: "Generating...",
+    aiGeneratingHint: "AI is analyzing your input and generating diagram…",
+    errNoCredits: "Insufficient credits (current: {n} credits). Please purchase more credits.",
+    errTimeout: "Request timed out. Please check your network and retry.",
+    errNetwork: "Network error. Please check your connection and retry.",
+    errNotAuth: "Please sign in before generating.",
+    errEmptyResult: "AI returned empty content.",
+    errDefault: "Failed to generate diagram, please retry.",
+    creditsModalTitle: "Insufficient Credits",
+    creditsModalDesc: "You need at least 3 credits to generate a diagram. Purchase credits to continue.",
+    creditsModalBuy: "Buy Credits",
+    creditsModalCancel: "Cancel",
   },
   zh: {
     navFeatures: "功能",
@@ -243,6 +263,26 @@ export const translations = {
 
     pageTitle: "ChartPRD - AI一键生成PRD图表",
     pageDescription: "上传PRD文档，AI自动生成时序图、流程图、用户体验地图。专为产品经理打造的PRD可视化工具。",
+
+    // Editor AI Modal
+    aiModalTitle: "AI 生成图表",
+    aiModalDesc: "描述你想要创建的图表",
+    aiModalPlaceholder: "例如：用户登录流程，包含手机号验证码登录",
+    aiUploadDoc: "上传文档",
+    aiCancel: "取消",
+    aiGenerate: "生成",
+    aiGenerating: "生成中...",
+    aiGeneratingHint: "AI 正在分析输入并生成图表…",
+    errNoCredits: "积分不足（当前 {n} 积分），请先购买积分。",
+    errTimeout: "请求超时，请检查网络后重试。",
+    errNetwork: "网络连接失败，请检查网络后重试。",
+    errNotAuth: "请先登录后再生成。",
+    errEmptyResult: "AI 返回内容为空。",
+    errDefault: "生成图表失败，请重试。",
+    creditsModalTitle: "积分不足",
+    creditsModalDesc: "生成图表至少需要 3 积分，请购买积分后继续。",
+    creditsModalBuy: "购买积分",
+    creditsModalCancel: "取消",
   },
 };
 

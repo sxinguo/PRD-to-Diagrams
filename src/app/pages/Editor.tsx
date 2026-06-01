@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { useLang } from "../i18n";
 import mermaid from "mermaid";
 import MonacoEditor from "@monaco-editor/react";
-import { useSearchParams } from "react-router";
+import { useSearchParams, useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../../lib/supabase";
 import * as mammoth from "mammoth";
@@ -97,6 +97,7 @@ const DEMO_MERMAID = `sequenceDiagram
 export function EditorPage() {
   const { t, lang } = useLang();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initialPrompt = searchParams.get('prompt') || '';
   const initialCode = searchParams.get('code') || sessionStorage.getItem('mermaidCode') || '';
 
@@ -116,6 +117,7 @@ export function EditorPage() {
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [isAIGenerating, setIsAIGenerating] = useState(false);
+  const [showCreditsModal, setShowCreditsModal] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<{ name: string; content: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [scale, setScale] = useState(1);
@@ -640,16 +642,26 @@ export function EditorPage() {
     if (!combinedContent) return;
 
     if (user && profile && profile.credits_remaining < 3) {
-      alert("积分不足（当前 " + profile.credits_remaining + " 积分），请先购买积分");
+      setShowCreditsModal(true);
       return;
     }
 
     setIsAIGenerating(true);
+    setProgress(0);
+
+    const progressInterval = setInterval(() => {
+      setProgress(prev => Math.min(prev + 3, 90));
+    }, 150);
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || '/api';
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token || ANON_KEY;
+
+      // Client-side timeout: 90s
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 90000);
+
       const response = await fetch(`${apiUrl}/generate-diagram`, {
         method: 'POST',
         headers: {
@@ -659,26 +671,63 @@ export function EditorPage() {
         body: JSON.stringify({
           prd: combinedContent,
           diagramType: diagramType
-        })
+        }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error('生成图表失败');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMsg = errorData.error || `HTTP ${response.status}`;
+        console.error('[handleAIGenerate] API error:', response.status, errorData);
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
       const generated = data.code;
+
+      if (!generated) {
+        console.error('[handleAIGenerate] Empty code in response:', data);
+        throw new Error('AI returned empty content');
+      }
+
+      clearInterval(progressInterval);
+      setProgress(100);
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       setCode(generated);
       setIsAIGenerating(false);
       setShowAIChat(false);
       setAiPrompt("");
+      setUploadedFile(null);
       refreshProfile();
 
       // 自动渲染并更新状态
       await renderMermaid(generated);
       setIsDone(true);
-    } catch (error) {
-      alert('生成图表失败，请重试');
+    } catch (error: any) {
+      clearInterval(progressInterval);
+      setProgress(0);
+      console.error('[handleAIGenerate] Failed:', error);
+
+      // Translate common error types to user-friendly messages
+      let errMsg: string;
+      if (error?.name === 'AbortError') {
+        errMsg = t.errTimeout;
+      } else if (error?.message === 'Failed to fetch') {
+        errMsg = t.errNetwork;
+      } else if (error?.message === 'Not authenticated') {
+        errMsg = t.errNotAuth;
+      } else if (error?.message === 'AI returned empty content' || error?.message === 'AI返回内容为空') {
+        errMsg = t.errEmptyResult;
+      } else if (error?.message === '积分不足') {
+        errMsg = t.errNoCredits.replace('{n}', '0');
+      } else {
+        errMsg = t.errDefault;
+      }
+
+      alert(errMsg);
       setIsAIGenerating(false);
     }
   };
@@ -964,14 +1013,14 @@ export function EditorPage() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Sparkles size={20} style={{ color: "#7c3aed" }} />
-              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#1e0a3c" }}>AI Generate Diagram</h3>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#1e0a3c" }}>{t.aiModalTitle}</h3>
             </div>
             <p style={{ fontSize: "0.85rem", color: "#6b7280", marginBottom: "16px" }}>
-              Describe what diagram you want to create
+              {t.aiModalDesc}
             </p>
 
             {uploadedFile && (
-              <div className="mb-3 p-2 rounded-lg flex items-center justify-between" style={{ background: "#f3f4f6", border: "1px solid #e5e7eb" }}>
+              <div className="mb-3 p-2 rounded-lg flex items-center justify-between" style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", opacity: isAIGenerating ? 0.5 : 1, pointerEvents: isAIGenerating ? "none" : "auto" }}>
                 <div className="flex items-center gap-2">
                   <FileText size={16} style={{ color: "#7c3aed" }} />
                   <span style={{ fontSize: "0.85rem", color: "#374151" }}>{uploadedFile.name}</span>
@@ -985,9 +1034,9 @@ export function EditorPage() {
             <textarea
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder="e.g., 用户登录流程，包含手机号验证码登录"
+              placeholder={t.aiModalPlaceholder}
               className="w-full p-3 rounded-lg text-sm"
-              style={{ border: "1px solid rgba(124,58,237,0.2)", minHeight: "120px", resize: "vertical", fontFamily: "inherit" }}
+              style={{ border: "1px solid rgba(124,58,237,0.2)", minHeight: "120px", resize: "vertical", fontFamily: "inherit", opacity: isAIGenerating ? 0.5 : 1, pointerEvents: isAIGenerating ? "none" : "auto" }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && e.ctrlKey) {
                   handleAIGenerate();
@@ -1003,41 +1052,86 @@ export function EditorPage() {
               style={{ display: 'none' }}
             />
 
-            <div className="flex items-center justify-between mt-4">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
-                style={{ background: "transparent", border: "1px solid rgba(124,58,237,0.3)", color: "#7c3aed", cursor: "pointer" }}
-              >
-                <Upload size={14} />
-                上传文档
-              </button>
-
-              <div className="flex items-center gap-2">
-                <button onClick={() => setShowAIChat(false)}
-                  className="px-4 py-2 rounded-lg text-sm"
-                  style={{ background: "transparent", border: "1px solid #e5e7eb", color: "#6b7280", cursor: "pointer" }}>
-                  Cancel
+            {isAIGenerating ? (
+              <div className="mt-4">
+                <div className="flex justify-between text-xs mb-1.5">
+                  <span style={{ color: "#6b7280" }}>{t.aiGeneratingHint}</span>
+                  <span style={{ color: "#7c3aed", fontWeight: 600 }}>{Math.min(100, Math.round(progress))}%</span>
+                </div>
+                <div className="h-2 rounded-full" style={{ background: "#ede9fe" }}>
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ background: "linear-gradient(90deg, #7c3aed, #a855f7)" }}
+                    animate={{ width: `${Math.min(100, progress)}%` }}
+                    transition={{ duration: 0.15 }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between mt-4">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
+                  style={{ background: "transparent", border: "1px solid rgba(124,58,237,0.3)", color: "#7c3aed", cursor: "pointer" }}
+                >
+                  <Upload size={14} />
+                  {t.aiUploadDoc}
                 </button>
-                <button onClick={handleAIGenerate} disabled={(!aiPrompt.trim() && !uploadedFile) || isAIGenerating}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm"
-                style={{
-                  background: (aiPrompt.trim() || uploadedFile) && !isAIGenerating ? "linear-gradient(135deg, #7c3aed, #a855f7)" : "#e5e7eb",
-                  border: "none",
-                  color: "#fff",
-                  cursor: (aiPrompt.trim() || uploadedFile) && !isAIGenerating ? "pointer" : "not-allowed"
-                }}>
-                {isAIGenerating ? (
-                  <>Generating...</>
-                ) : (
-                  <>
+
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setShowAIChat(false)}
+                    className="px-4 py-2 rounded-lg text-sm"
+                    style={{ background: "transparent", border: "1px solid #e5e7eb", color: "#6b7280", cursor: "pointer" }}>
+                    {t.aiCancel}
+                  </button>
+                  <button onClick={handleAIGenerate} disabled={!aiPrompt.trim() && !uploadedFile}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm"
+                  style={{
+                    background: (aiPrompt.trim() || uploadedFile) ? "linear-gradient(135deg, #7c3aed, #a855f7)" : "#e5e7eb",
+                    border: "none",
+                    color: "#fff",
+                    cursor: (aiPrompt.trim() || uploadedFile) ? "pointer" : "not-allowed"
+                  }}>
                     <Send size={14} />
-                    Generate
-                  </>
-                )}
+                    {t.aiGenerate}
+                  </button>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
+
+      {/* Insufficient Credits Modal */}
+      {showCreditsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.5)" }} onClick={() => setShowCreditsModal(false)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm mx-4"
+            style={{ background: "#fff", borderRadius: "16px", padding: "24px", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Zap size={20} style={{ color: "#f59e0b" }} />
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#1e0a3c" }}>{t.creditsModalTitle}</h3>
+            </div>
+            <p style={{ fontSize: "0.85rem", color: "#6b7280", marginBottom: "20px", lineHeight: 1.6 }}>
+              {t.creditsModalDesc}
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              <button onClick={() => setShowCreditsModal(false)}
+                className="px-4 py-2 rounded-lg text-sm"
+                style={{ background: "transparent", border: "1px solid #e5e7eb", color: "#6b7280", cursor: "pointer" }}>
+                {t.creditsModalCancel}
+              </button>
+              <button onClick={() => { setShowCreditsModal(false); navigate('/pricing'); }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm"
+                style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "#fff", cursor: "pointer" }}>
+                <Zap size={14} />
+                {t.creditsModalBuy}
               </button>
             </div>
-          </div>
           </motion.div>
         </div>
       )}
