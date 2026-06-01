@@ -1,4 +1,3 @@
-import { FileText } from "lucide-react";
 import { useLang } from "../i18n";
 
 export function Footer() {
@@ -19,10 +18,12 @@ export function Footer() {
           {/* Brand */}
           <div className="flex-shrink-0">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}>
-                <FileText size={16} color="#fff" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="PRD Chart"
+                className="w-8 h-8 rounded-lg"
+                style={{ objectFit: "cover" }}
+              />
               <span style={{ color: "#1e0a3c", fontWeight: 700 }}>
                 PRD<span style={{ color: "#7c3aed" }}>-Chart</span>
               </span>

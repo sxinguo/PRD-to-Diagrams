@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Menu, X, FileText, LogOut, User, Coins } from "lucide-react";
+import { Sparkles, Menu, X, LogOut, User, Coins } from "lucide-react";
 import { useLang } from "../i18n";
 import { Link, useLocation } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
@@ -33,10 +33,12 @@ export function Navbar() {
       >
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 no-underline">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}>
-            <FileText size={16} color="#fff" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="PRD Chart"
+            className="w-8 h-8 rounded-lg"
+            style={{ objectFit: "cover" }}
+          />
           <span style={{ color: "#1e0a3c", fontWeight: 700, letterSpacing: "-0.02em" }}>
             <span style={{ color: "#7c3aed" }}>PRD</span><span style={{ color: "#1e0a3c" }}>-Chart</span>
           </span>
