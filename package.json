@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && node scripts/ssr-prerender.mjs",
     "dev": "vite",
-    "vercel-build": "vite build"
+    "vercel-build": "vite build && node scripts/ssr-prerender.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /editor
+Disallow: /debug
+Disallow: /api/
+
+Sitemap: https://prdchart.art/sitemap.xml
