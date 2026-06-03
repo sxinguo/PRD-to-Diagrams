@@ -12,7 +12,7 @@ const faqs = {
   en: [
     {
       question: "What types of diagrams are supported?",
-      answer: "ChartPRD supports three major diagram types: Sequence Diagrams (user-system interaction flows), Flowcharts (business process visualization), and User Journey Maps (customer experience mapping)."
+      answer: "PRD Chart supports three major diagram types: Mermaid Sequence Diagrams (user-system interaction flows), Mermaid Flowcharts (business process visualization), and Mermaid User Journey Maps (customer experience mapping)."
     },
     {
       question: "How do I generate a diagram?",
@@ -46,7 +46,7 @@ const faqs = {
   zh: [
     {
       question: "支持哪些类型的图表？",
-      answer: "ChartPRD 支持三大图表类型：时序图（用户与系统交互流程）、流程图（业务流程可视化）、用户旅程地图（客户体验地图）。"
+      answer: "PRD Chart 支持三大图表类型：Mermaid 时序图（用户与系统交互流程）、Mermaid 流程图（业务流程可视化）、Mermaid 用户旅程地图（客户体验地图）。"
     },
     {
       question: "如何生成图表？",
@@ -97,7 +97,7 @@ function FAQItem({ item, isOpen, onClick }: { item: FAQItem; isOpen: boolean; on
         className="w-full flex items-center justify-between px-5 py-4 text-left"
         style={{ background: "transparent", border: "none", cursor: "pointer" }}
       >
-        <span style={{ fontWeight: 600, color: "#1e0a3c", fontSize: "0.95rem" }}>{item.question}</span>
+        <h3 style={{ fontWeight: 600, color: "#1e0a3c", fontSize: "0.95rem", margin: 0 }}>{item.question}</h3>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}

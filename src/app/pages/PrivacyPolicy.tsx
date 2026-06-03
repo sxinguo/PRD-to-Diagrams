@@ -11,7 +11,7 @@ export function PrivacyPolicyPage() {
 
         <div style={{ color: "#374151", fontSize: "15px", lineHeight: "1.8" }}>
           <p style={{ marginBottom: "24px" }}>
-            ChartPRD ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our PRD to diagram generation service.
+            PRD Chart ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our mermaid chart and diagram generation service.
           </p>
 
           <h2 style={{ fontSize: "20px", fontWeight: 600, color: "#1e0a3c", marginTop: "32px", marginBottom: "16px" }}>
@@ -121,7 +121,7 @@ export function PrivacyPolicyPage() {
             If you have questions about this Privacy Policy or wish to exercise your rights, please contact us at:
           </p>
           <p style={{ marginBottom: "4px" }}>
-            <strong>Email:</strong> support@anyvoice.net
+            <strong>Email:</strong> feedback9980@163.com
           </p>
         </div>
       </div>

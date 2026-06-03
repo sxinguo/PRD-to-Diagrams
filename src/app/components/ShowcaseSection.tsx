@@ -31,19 +31,19 @@ export function ShowcaseSection() {
             className="inline-block px-3 py-1 rounded-full text-xs mb-4"
             style={{ background: "#ede9fe", border: "1px solid rgba(124,58,237,0.2)", color: "#7c3aed" }}
           >
-            {lang === "zh" ? "图表演示" : "Diagram Showcase"}
+            {lang === "zh" ? "Mermaid 图表演示" : "Mermaid Chart Showcase"}
           </div>
           <h2 style={{ color: "#1e0a3c", letterSpacing: "-0.03em", marginBottom: 10, fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 800 }}>
             {lang === "zh" ? (
-              <>从 PRD 到专业图表，<span style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>一键生成</span></>
+              <>从 PRD 到 Mermaid 图表，<span style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>一键生成</span></>
             ) : (
-              <>From PRD to Professional Diagrams, <span style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>One Click</span></>
+              <>From PRD to Mermaid Charts, <span style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>One Click</span></>
             )}
           </h2>
           <p style={{ color: "#9ca3af", maxWidth: 460, margin: "0 auto", fontSize: "0.95rem" }}>
             {lang === "zh"
-              ? "支持时序图、流程图、用户旅程地图等多种图表类型"
-              : "Support for sequence diagrams, flowcharts, user journey maps and more"}
+              ? "生成 Mermaid 时序图、流程图、用户旅程地图等多种图表"
+              : "Generate mermaid sequence diagrams, flowcharts, user journey maps and more"}
           </p>
         </div>
 
@@ -123,7 +123,7 @@ export function ShowcaseSection() {
           <div style={{ background: "#fafbff" }}>
             <img
               src={showcaseImages[active]}
-              alt="Diagram preview"
+              alt={"Mermaid " + active + " diagram generated from PRD"}
               className="w-full"
               style={{ display: "block" }}
             />

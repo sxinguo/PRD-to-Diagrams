@@ -11,7 +11,7 @@ export function RefundPolicyPage() {
 
         <div style={{ color: "#374151", fontSize: "15px", lineHeight: "1.8" }}>
           <p style={{ marginBottom: "24px" }}>
-            Thank you for choosing the subscription service of AnyVoice.net. Before making a purchase, please carefully read this refund policy.
+            Thank you for choosing the subscription service of PRD Chart. Before making a purchase, please carefully read this refund policy.
           </p>
 
           <h2 style={{ fontSize: "20px", fontWeight: 600, color: "#1e0a3c", marginTop: "32px", marginBottom: "16px" }}>
@@ -38,7 +38,7 @@ export function RefundPolicyPage() {
             Dispute Resolution
           </h2>
           <p style={{ marginBottom: "16px" }}>
-            If you have any questions about the deduction, please contact support@anyvoice.net within 7 working days and provide:
+            If you have any questions about the deduction, please contact feedback9980@163.com within 7 working days and provide:
           </p>
           <ul style={{ marginLeft: "24px", marginBottom: "24px", listStyle: "disc" }}>
             <li>Transaction ID</li>
@@ -53,7 +53,7 @@ export function RefundPolicyPage() {
             Right to Change the Policy
           </h2>
           <p style={{ marginBottom: "24px" }}>
-            AnyVoice.net reserves the right to modify this policy at any time. The revised policy will take effect immediately after being publicly announced on the website.
+            PRD Chart reserves the right to modify this policy at any time. The revised policy will take effect immediately after being publicly announced on the website.
           </p>
 
           <h2 style={{ fontSize: "20px", fontWeight: 600, color: "#1e0a3c", marginTop: "32px", marginBottom: "16px" }}>

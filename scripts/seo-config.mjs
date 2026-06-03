@@ -8,15 +8,15 @@ const OG_IMAGE = `${SITE_URL}/showcase/sequence-1.png`
 export const routes = [
   {
     path: '/',
-    title: 'PRD Chart - AI-Powered PRD to Diagram Converter',
-    description: 'Upload your PRD and instantly generate sequence diagrams, flowcharts, and user journey maps. Built for product managers.',
+    title: 'PRD Chart - AI Mermaid Chart & Diagram Generator from PRD',
+    description: 'Generate mermaid charts and diagrams from your PRD instantly. AI-powered mermaid sequence diagrams, flowcharts, and user journey maps. Built for product managers.',
     ogImage: OG_IMAGE,
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
       name: 'PRD Chart',
       url: SITE_URL,
-      description: 'AI-powered PRD to diagram converter. Generate sequence diagrams, flowcharts, and user journey maps from product requirements.',
+      description: 'AI-powered PRD to mermaid chart and diagram converter. Generate mermaid sequence diagrams, flowcharts, and user journey maps from product requirements.',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
       offers: {
@@ -28,8 +28,8 @@ export const routes = [
   },
   {
     path: '/pricing',
-    title: 'PRD Chart Pricing - Credits & Plans',
-    description: 'Choose the right plan for your diagram needs. Free credits on signup, affordable packs for teams and professionals.',
+    title: 'PRD Chart Pricing - Mermaid Chart & Diagram Plans',
+    description: 'Choose the right plan for your mermaid chart and diagram needs. Free credits on signup, affordable packs for teams and professionals.',
     ogImage: OG_IMAGE,
     jsonLd: {
       '@context': 'https://schema.org',
@@ -47,8 +47,8 @@ export const routes = [
   },
   {
     path: '/faq',
-    title: 'PRD Chart FAQ - Frequently Asked Questions',
-    description: 'Answers to common questions about PRD Chart: diagram types, credits, export formats, accuracy, and more.',
+    title: 'PRD Chart FAQ - Mermaid Chart & Diagram Generator Questions',
+    description: 'Answers to common questions about PRD Chart: mermaid diagram types, credits, export formats, accuracy, and more.',
     ogImage: OG_IMAGE,
     jsonLd: {
       '@context': 'https://schema.org',
@@ -59,7 +59,7 @@ export const routes = [
           name: 'What types of diagrams are supported?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'ChartPRD supports three major diagram types: Sequence Diagrams (user-system interaction flows), Flowcharts (business process visualization), and User Journey Maps (customer experience mapping).',
+            text: 'PRD Chart supports three major diagram types: Mermaid Sequence Diagrams (user-system interaction flows), Mermaid Flowcharts (business process visualization), and Mermaid User Journey Maps (customer experience mapping).',
           },
         },
         {
