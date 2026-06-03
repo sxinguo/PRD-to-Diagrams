@@ -1,7 +1,7 @@
 // SEO configuration for each prerendered route
 // Single source of truth for meta tags, OG tags, and JSON-LD structured data
 
-const SITE_URL = 'https://prdchart.art'
+const SITE_URL = 'https://www.prdchart.art'
 const SITE_NAME = 'PRD Chart'
 const OG_IMAGE = `${SITE_URL}/showcase/sequence-1.png`
 

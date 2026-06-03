@@ -35,7 +35,7 @@ export function Navbar() {
         <Link to="/" className="flex items-center gap-2 no-underline">
           <img
             src="/logo.png"
-            alt="PRD Chart"
+            alt="PRD Chart logo - AI Mermaid diagram generator"
             className="w-8 h-8 rounded-lg"
             style={{ objectFit: "cover" }}
           />
@@ -100,7 +100,7 @@ export function Navbar() {
                 {user.user_metadata?.avatar_url ? (
                   <img
                     src={user.user_metadata.avatar_url}
-                    alt="avatar"
+                    alt="User profile avatar"
                     className="w-6 h-6 rounded-full"
                   />
                 ) : (
@@ -132,17 +132,19 @@ export function Navbar() {
                 style={{ color: "#6b7280", background: "transparent", border: "none", cursor: "pointer", padding: "8px 14px", fontSize: "0.9rem" }}>
                 {t.navSignIn}
               </button>
-              <button style={{
-                background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-                border: "none",
-                borderRadius: "8px",
-                color: "#fff",
-                padding: "8px 18px",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                boxShadow: "0 2px 12px rgba(124,58,237,0.3)",
-              }}>
+              <button
+                onClick={() => setShowAuthModal(true)}
+                style={{
+                  background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+                  border: "none",
+                  borderRadius: "8px",
+                  color: "#fff",
+                  padding: "8px 18px",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "0.875rem",
+                  boxShadow: "0 2px 12px rgba(124,58,237,0.3)",
+                }}>
                 {t.navGetStarted}
               </button>
             </>
@@ -188,16 +190,18 @@ export function Navbar() {
                 </a>
               )
             )}
-            <button style={{
-              background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-              border: "none",
-              borderRadius: "8px",
-              color: "#fff",
-              padding: "10px 20px",
-              cursor: "pointer",
-              marginTop: "8px",
-              fontWeight: 600,
-            }}>
+            <button
+              onClick={() => { setMobileOpen(false); setShowAuthModal(true); }}
+              style={{
+                background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+                border: "none",
+                borderRadius: "8px",
+                color: "#fff",
+                padding: "10px 20px",
+                cursor: "pointer",
+                marginTop: "8px",
+                fontWeight: 600,
+              }}>
               {t.navGetStarted}
             </button>
           </div>

@@ -259,7 +259,7 @@ export function EnhancerWorkspace() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 className="flex flex-col items-center justify-center gap-6"
                 style={{ minHeight: 380, borderRadius: 16, background: "#fafbff", border: "1.5px solid rgba(124,58,237,0.1)" }}>
-                <img src={uploadedImage} alt="Processing" className="max-h-48 object-contain rounded-xl"
+                <img src={uploadedImage} alt="Uploaded diagram being processed by AI enhancer" className="max-h-48 object-contain rounded-xl"
                   style={{ opacity: 0.4 }} />
                 <div className="w-full max-w-xs flex flex-col gap-3 px-8">
                   <div className="flex justify-between text-sm">
@@ -299,7 +299,7 @@ export function EnhancerWorkspace() {
                   </button>
                 </div>
                 <div style={{ borderRadius: 16, overflow: "hidden", border: "1.5px solid rgba(124,58,237,0.1)", boxShadow: "0 4px 20px rgba(124,58,237,0.08)" }}>
-                  <img src={uploadedImage} alt="Uploaded" className="w-full object-contain"
+                  <img src={uploadedImage} alt="Uploaded mermaid diagram ready for AI enhancement" className="w-full object-contain"
                     style={{ maxHeight: 340, background: "#f8f7ff" }} />
                 </div>
               </motion.div>

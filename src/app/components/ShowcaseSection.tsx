@@ -123,7 +123,12 @@ export function ShowcaseSection() {
           <div style={{ background: "#fafbff" }}>
             <img
               src={showcaseImages[active]}
-              alt={"Mermaid " + active + " diagram generated from PRD"}
+              alt={
+                active === "sequence" ? "Mermaid sequence diagram showing user-system interaction flows generated from PRD"
+                : active === "flowchart" ? "Mermaid flowchart visualizing business process logic generated from PRD"
+                : active === "journey" ? "Mermaid user journey map illustrating customer experience stages generated from PRD"
+                : "Mermaid diagram generated from PRD text, including sequence diagrams, flowcharts and user journey maps"
+              }
               className="w-full"
               style={{ display: "block" }}
             />

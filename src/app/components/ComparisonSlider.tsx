@@ -64,14 +64,14 @@ export function ComparisonSlider({ originalSrc, enhancedSrc, enhancementMode }: 
       onTouchStart={handleTouchStart}
     >
       {/* Enhanced */}
-      <img src={enhancedSrc} alt="Enhanced"
+      <img src={enhancedSrc} alt="AI-enhanced mermaid diagram with improved clarity and styling"
         className="absolute inset-0 w-full h-full object-cover"
         style={{ filter: getEnhancedFilter(), imageRendering: "crisp-edges" }}
         draggable={false} />
 
       {/* Original (clipped left) */}
       <div className="absolute inset-0 overflow-hidden" style={{ width: `${position}%` }}>
-        <img src={originalSrc} alt="Original"
+        <img src={originalSrc} alt="Original mermaid diagram before AI enhancement"
           className="absolute top-0 left-0 h-full object-cover"
           style={{ width: containerRef.current ? `${containerRef.current.offsetWidth}px` : "100%", filter: "brightness(0.88) contrast(0.9) saturate(0.85)" }}
           draggable={false} />

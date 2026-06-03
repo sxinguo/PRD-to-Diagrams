@@ -4,4 +4,4 @@ Disallow: /editor
 Disallow: /debug
 Disallow: /api/
 
-Sitemap: https://prdchart.art/sitemap.xml
+Sitemap: https://www.prdchart.art/sitemap.xml
