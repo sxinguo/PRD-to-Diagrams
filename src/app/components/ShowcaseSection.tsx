@@ -31,7 +31,7 @@ export function ShowcaseSection() {
             className="inline-block px-3 py-1 rounded-full text-xs mb-4"
             style={{ background: "#ede9fe", border: "1px solid rgba(124,58,237,0.2)", color: "#7c3aed" }}
           >
-            {lang === "zh" ? "Mermaid 图表演示" : "Mermaid Chart Showcase"}
+            {lang === "zh" ? "图表演示" : "Chart Showcase"}
           </div>
           <h2 style={{ color: "#1e0a3c", letterSpacing: "-0.03em", marginBottom: 10, fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 800 }}>
             {lang === "zh" ? (
@@ -42,8 +42,8 @@ export function ShowcaseSection() {
           </h2>
           <p style={{ color: "#9ca3af", maxWidth: 460, margin: "0 auto", fontSize: "0.95rem" }}>
             {lang === "zh"
-              ? "生成 Mermaid 时序图、流程图、用户旅程地图等多种图表"
-              : "Generate mermaid sequence diagrams, flowcharts, user journey maps and more"}
+              ? "生成时序图、流程图、用户旅程地图等多种图表"
+              : "Generate sequence diagrams, flowcharts, user journey maps and more"}
           </p>
         </div>
 
@@ -124,10 +124,10 @@ export function ShowcaseSection() {
             <img
               src={showcaseImages[active]}
               alt={
-                active === "sequence" ? "Mermaid sequence diagram showing user-system interaction flows generated from PRD"
-                : active === "flowchart" ? "Mermaid flowchart visualizing business process logic generated from PRD"
-                : active === "journey" ? "Mermaid user journey map illustrating customer experience stages generated from PRD"
-                : "Mermaid diagram generated from PRD text, including sequence diagrams, flowcharts and user journey maps"
+                active === "sequence" ? "Sequence diagram showing user-system interaction flows generated from PRD"
+                : active === "flowchart" ? "Flowchart visualizing business process logic generated from PRD"
+                : active === "journey" ? "User journey map illustrating customer experience stages generated from PRD"
+                : "Diagram generated from PRD text, including sequence diagrams, flowcharts and user journey maps"
               }
               className="w-full"
               style={{ display: "block" }}

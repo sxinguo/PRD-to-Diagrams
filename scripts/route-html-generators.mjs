@@ -114,15 +114,15 @@ export function generateHomeHtml(t) {
   <!-- SHOWCASE SECTION -->
   <section id="showcase" style="padding:48px 32px;background:#fff">
     <div style="max-width:1152px;margin:0 auto;text-align:center">
-      <div style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:0.75rem;background:#ede9fe;border:1px solid rgba(124,58,237,0.2);color:#7c3aed;margin-bottom:16px">Mermaid Chart Showcase</div>
+      <div style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:0.75rem;background:#ede9fe;border:1px solid rgba(124,58,237,0.2);color:#7c3aed;margin-bottom:16px">Chart Showcase</div>
       <h2 style="color:#1e0a3c;letter-spacing:-0.03em;margin-bottom:10px">From PRD to Mermaid Charts, <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">One Click</span></h2>
-      <p style="color:#9ca3af;max-width:460px;margin:0 auto 32px">Generate mermaid sequence diagrams, flowcharts, user journey maps and more</p>
+      <p style="color:#9ca3af;max-width:460px;margin:0 auto 32px">Generate sequence diagrams, flowcharts, user journey maps and more</p>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
         <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(124,58,237,0.1);box-shadow:0 4px 20px rgba(124,58,237,0.07)">
           <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#f8f7ff 0%,#fdf4ff 100%);display:flex;align-items:center;justify-content:center">
             <div style="text-align:center">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" style="margin-bottom:8px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
-              <span style="display:block;color:#1e0a3c;font-weight:600;font-size:0.9rem">Mermaid Sequence Diagram</span>
+              <span style="display:block;color:#1e0a3c;font-weight:600;font-size:0.9rem">Sequence Diagram</span>
             </div>
           </div>
           <div style="padding:12px 16px;background:#fafbff;border-top:1px solid rgba(124,58,237,0.07)"><span style="font-size:0.875rem;color:#374151">User Login Sequence</span></div>
@@ -131,7 +131,7 @@ export function generateHomeHtml(t) {
           <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#f8f7ff 0%,#fdf4ff 100%);display:flex;align-items:center;justify-content:center">
             <div style="text-align:center">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" style="margin-bottom:8px"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 01-9 9"/></svg>
-              <span style="display:block;color:#1e0a3c;font-weight:600;font-size:0.9rem">Mermaid Flowchart</span>
+              <span style="display:block;color:#1e0a3c;font-weight:600;font-size:0.9rem">Flowchart</span>
             </div>
           </div>
           <div style="padding:12px 16px;background:#fafbff;border-top:1px solid rgba(124,58,237,0.07)"><span style="font-size:0.875rem;color:#374151">Order Processing Flow</span></div>
@@ -140,7 +140,7 @@ export function generateHomeHtml(t) {
           <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#f8f7ff 0%,#fdf4ff 100%);display:flex;align-items:center;justify-content:center">
             <div style="text-align:center">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" style="margin-bottom:8px"><polygon points="3,6 9,3 15,6 21,3 21,18 15,21 9,18 3,21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
-              <span style="display:block;color:#1e0a3c;font-weight:600;font-size:0.9rem">Mermaid User Journey</span>
+              <span style="display:block;color:#1e0a3c;font-weight:600;font-size:0.9rem">User Journey Map</span>
             </div>
           </div>
           <div style="padding:12px 16px;background:#fafbff;border-top:1px solid rgba(124,58,237,0.07)"><span style="font-size:0.875rem;color:#374151">New User Registration Journey</span></div>
@@ -262,7 +262,7 @@ export function generatePricingHtml(t) {
 // FAQ page — semantic Q&A pairs for Google rich results
 export function generateFaqHtml(t) {
   const faqs = [
-    { q: 'What types of diagrams are supported?', a: 'PRD Chart supports three major diagram types: Mermaid Sequence Diagrams (user-system interaction flows), Mermaid Flowcharts (business process visualization), and Mermaid User Journey Maps (customer experience mapping).' },
+    { q: 'What types of diagrams are supported?', a: 'PRD Chart supports three major diagram types: Sequence Diagrams (user-system interaction flows), Flowcharts (business process visualization), and User Journey Maps (customer experience mapping).' },
     { q: 'How do I generate a diagram?', a: "Simply describe your requirement in the input box on the homepage, select your preferred diagram type, then click 'Start Generating'. Our AI will analyze your PRD text and generate professional Mermaid code instantly." },
     { q: 'How many credits does one generation cost?', a: 'Each diagram generation costs 3 credits. You can preview the generated diagram and export it in PNG or SVG format.' },
     { q: 'What PRD formats are supported?', a: 'We support plain text, Markdown format, and structured PRD documents. Simply paste your PRD text or upload a .txt file to get started.' },
