@@ -161,59 +161,50 @@ export function EditorPage() {
     const bgRect = svgClone.querySelector('rect[fill="#ffffff"], rect[fill="white"]');
     if (bgRect) bgRect.remove();
 
-    // 修复 Tainted Canvas: foreignObject 内部引用外部资源会导致 canvas 跨域污染
-    // 将所有 foreignObject 替换为纯 SVG <text> 元素，避免 toBlob 报 SecurityError
-    const foreignObjects = svgClone.querySelectorAll('foreignObject');
-    foreignObjects.forEach((fo) => {
-      const x = fo.getAttribute('x') || '0';
-      const y = fo.getAttribute('y') || '0';
-      const width = fo.getAttribute('width') || 'auto';
-      const height = fo.getAttribute('height') || 'auto';
-
-      // 提取 foreignObject 内部的文本内容
-      const body = fo.querySelector('div, span, p, body');
-      const textContent = body?.textContent || fo.textContent || '';
-
-      if (!textContent.trim()) return;
-
-      // 从内联样式或计算样式中获取字体信息
-      const computedStyle = body ? (body as HTMLElement).style : null;
-      const fontSize = computedStyle?.fontSize || '12px';
-      const fontFamily = computedStyle?.fontFamily || 'inherit';
-      const fontWeight = computedStyle?.fontWeight || 'normal';
-      const fill = computedStyle?.color || '#333';
-
-      // 创建替代的 <text> 元素
-      const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      textEl.setAttribute('x', x);
-      // SVG text 的 y 是基线位置，需要加上字体大小偏移
-      const fontSizeNum = parseFloat(fontSize);
-      const yNum = parseFloat(y);
-      textEl.setAttribute('y', String(yNum + fontSizeNum));
-      textEl.setAttribute('font-size', fontSize);
-      textEl.setAttribute('font-family', fontFamily);
-      textEl.setAttribute('font-weight', fontWeight);
-      textEl.setAttribute('fill', fill);
-      textEl.setAttribute('width', width);
-      textEl.setAttribute('height', height);
-      textEl.textContent = textContent;
-
-      fo.replaceWith(textEl);
-    });
-
-    // 移除所有 <image> 元素中的外部 href（防止跨域资源污染 canvas）
-    const images = svgClone.querySelectorAll('image');
-    images.forEach((img) => {
-      const href = img.getAttribute('href') || img.getAttribute('xlink:href');
-      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
-        img.remove();
-      }
-    });
-
     // 确保 xmlns 属性存在，否则 Image 无法加载 SVG
     if (!svgClone.getAttribute('xmlns')) {
       svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     }
+
+    // === 清理所有会导致 Canvas 跨域污染的外部引用 ===
+
+    // 1. 移除 <style> 标签中所有引用外部 URL 的规则（@font-face, @import 等）
+    const styleTags = svgClone.querySelectorAll('style');
+    styleTags.forEach((styleTag) => {
+      let css = styleTag.textContent || '';
+      // 移除 @font-face 块（包含外部字体 URL）
+      css = css.replace(/@font-face\s*\{[^}]*\}/gi, (match) => {
+        return match.match(/url\([^)]*(?:https?:\/\/)[^)]*\)/i) ? '' : match;
+      });
+      // 移除 @import 语句
+      css = css.replace(/@import\s+[^;]+;/gi, (match) => {
+        return match.match(/https?:\/\//i) ? '' : match;
+      });
+      // 移除其他 url(http/https) 引用
+      css = css.replace(/url\(\s*["']?https?:\/\/[^)]*\)/gi, 'url()');
+      styleTag.textContent = css;
+    });
+
+    // 2. 移除所有 <foreignObject>（跨域 HTML 内容）
+    svgClone.querySelectorAll('foreignObject').forEach((fo) => {
+      fo.remove();
+    });
+
+    // 3. 移除引用外部 URL 的 <image> 元素
+    svgClone.querySelectorAll('image').forEach((img) => {
+      const href = img.getAttribute('href') || img.getAttribute('xlink:href') || '';
+      if (href.startsWith('http://') || href.startsWith('https://')) {
+        img.remove();
+      }
+    });
+
+    // 4. 移除所有 <use> 元素中的外部引用
+    svgClone.querySelectorAll('use').forEach((use) => {
+      const href = use.getAttribute('href') || use.getAttribute('xlink:href') || '';
+      if (href.startsWith('http://') || href.startsWith('https://')) {
+        use.remove();
+      }
+    });
 
     const viewBox = svgClone.getAttribute('viewBox');
     let width = parseFloat(svgClone.getAttribute('width') || '800');
@@ -246,15 +237,24 @@ export function EditorPage() {
       ctx.scale(scale, scale);
       ctx.drawImage(img, 0, 0, width, height);
 
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const link = document.createElement('a');
-          link.download = `diagram-${Date.now()}.png`;
-          link.href = URL.createObjectURL(blob);
-          link.click();
-          URL.revokeObjectURL(link.href);
-        }
-      }, 'image/png');
+      try {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const link = document.createElement('a');
+            link.download = `diagram-${Date.now()}.png`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+          }
+        }, 'image/png');
+      } catch (e) {
+        // toBlob 仍然失败时的兜底：直接下载 SVG 文件
+        const svgLink = document.createElement('a');
+        svgLink.download = `diagram-${Date.now()}.svg`;
+        svgLink.href = URL.createObjectURL(new Blob([svgData], { type: 'image/svg+xml' }));
+        svgLink.click();
+        URL.revokeObjectURL(svgLink.href);
+      }
 
       URL.revokeObjectURL(url);
     };
