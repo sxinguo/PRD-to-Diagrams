@@ -13,7 +13,6 @@ export const translations = {
     navGetStarted: "Get Started Free",
 
     // Hero
-    heroBadge: "Trusted by 10,000+ Product Managers",
     heroH1a: "Turn PRD into Mermaid",
     heroH1b: "Charts Instantly",
     heroDesc: "Built for product managers and developers. Upload your PRD, AI instantly generates sequence diagrams, flowcharts, and journey maps.",
@@ -155,7 +154,6 @@ export const translations = {
     navSignIn: "登录",
     navGetStarted: "免费开始使用",
 
-    heroBadge: "超过 10,000 名产品经理信赖",
     heroH1a: "将 PRD 转化为 Mermaid",
     heroH1b: "图表，一键生成",
     heroDesc: "专为产品经理和程序员打造。上传 PRD，AI 即时生成时序图、流程图、旅程地图。",

@@ -22,7 +22,7 @@ function navbar(t) {
   <div style="display:flex;align-items:center;gap:32px">
     <a href="/#features" style="color:#4b5563;text-decoration:none;font-size:0.9rem">${esc(t.featuresH2a)}</a>
     <a href="/pricing" style="color:#4b5563;text-decoration:none;font-size:0.9rem">${esc(t.pricingBadge)}</a>
-    <a href="/faq" style="color:#4b5563;text-decoration:none;font-size:0.9rem">${esc(t.navFAQ)}</a>
+    <a href="/#faq" style="color:#4b5563;text-decoration:none;font-size:0.9rem">${esc(t.navFAQ)}</a>
   </div>
   <div style="display:flex;align-items:center;gap:12px">
     <a href="/editor" style="padding:8px 18px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;color:#fff;font-weight:600;cursor:pointer;font-size:0.875rem;text-decoration:none;box-shadow:0 2px 12px rgba(124,58,237,0.3)">${esc(t.navGetStarted)}</a>
@@ -45,7 +45,7 @@ function footer(t) {
         <a href="/privacy-policy" style="font-size:0.75rem;color:#9ca3af;text-decoration:none">${esc(t.navPrivacyPolicy)}</a>
         <a href="/pricing" style="font-size:0.75rem;color:#9ca3af;text-decoration:none">${esc(t.pricingBadge)}</a>
         <a href="/refund-policy" style="font-size:0.75rem;color:#9ca3af;text-decoration:none">${esc(t.navRefundPolicy)}</a>
-        <a href="/faq" style="font-size:0.75rem;color:#9ca3af;text-decoration:none">${esc(t.navFAQ)}</a>
+        <a href="/#faq" style="font-size:0.75rem;color:#9ca3af;text-decoration:none">${esc(t.navFAQ)}</a>
       </div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:12px;padding-top:32px;border-top:1px solid rgba(124,58,237,0.08)">
@@ -259,48 +259,6 @@ export function generatePricingHtml(t) {
 </div>`
 }
 
-// FAQ page — semantic Q&A pairs for Google rich results
-export function generateFaqHtml(t) {
-  const faqs = [
-    { q: 'What types of diagrams are supported?', a: 'PRD Chart supports three major diagram types: Sequence Diagrams (user-system interaction flows), Flowcharts (business process visualization), and User Journey Maps (customer experience mapping).' },
-    { q: 'How do I generate a diagram?', a: "Simply describe your requirement in the input box on the homepage, select your preferred diagram type, then click 'Start Generating'. Our AI will analyze your PRD text and generate professional Mermaid code instantly." },
-    { q: 'How many credits does one generation cost?', a: 'Each diagram generation costs 3 credits. You can preview the generated diagram and export it in PNG or SVG format.' },
-    { q: 'What PRD formats are supported?', a: 'We support plain text, Markdown format, and structured PRD documents. Simply paste your PRD text or upload a .txt file to get started.' },
-    { q: 'Can I export diagrams in other formats?', a: 'Yes, you can export your generated diagrams as PNG files.' },
-    { q: 'How accurate are the generated diagrams?', a: 'Our AI is built with neural precision to extract user-system interactions, business processes, and customer journeys from your PRD. The diagrams are production-ready and suitable for professional documentation.' },
-    { q: 'Do credits expire?', a: 'No, all purchased credits never expire. Pay as you go with no subscription required.' },
-    { q: 'Is there a free trial?', a: 'Yes, you get 12 free credits upon registration. Plus, if you use the service daily, you\'ll receive 3 bonus credits every day.' },
-  ]
-
-  return `<div style="min-height:100vh;background:linear-gradient(180deg,#fafbff 0%,#fff 100%);color:#1e0a3c;font-family:Inter,sans-serif;padding-top:64px">
-  ${navbar(t)}
-
-  <div style="max-width:768px;margin:0 auto;padding:64px 16px">
-    <div style="text-align:center;margin-bottom:40px">
-      <div style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:0.75rem;background:#ede9fe;border:1px solid rgba(124,58,237,0.2);color:#7c3aed;margin-bottom:16px">FAQ</div>
-      <h1 style="font-size:clamp(1.8rem,4vw,2.5rem);font-weight:800;letter-spacing:-0.03em;margin:0 0 10px">Frequently Asked Questions</h1>
-      <p style="color:#9ca3af;max-width:460px;margin:0 auto">Everything you need to know about diagram generation</p>
-    </div>
-
-    <div>
-      ${faqs.map(faq => `
-      <div style="border-radius:12px;overflow:hidden;border:1.5px solid rgba(124,58,237,0.1);background:#fff;margin-bottom:12px">
-        <h3 style="font-weight:600;color:#1e0a3c;font-size:0.95rem;margin:0;padding:16px 20px">${esc(faq.q)}</h3>
-        <div style="padding:0 20px 16px">
-          <p style="color:#6b7280;font-size:0.875rem;line-height:1.7;margin:0">${esc(faq.a)}</p>
-        </div>
-      </div>`).join('')}
-    </div>
-
-    <p style="text-align:center;color:#9ca3af;font-size:0.875rem;margin-top:32px">
-      Still have questions? <a href="mailto:support@chartprd.com" style="color:#7c3aed;text-decoration:none;font-weight:600">Contact us</a>
-    </p>
-  </div>
-
-  ${footer(t)}
-</div>`
-}
-
 // Privacy Policy page — static text content
 export function generatePrivacyHtml() {
   return `<div style="min-height:100vh;background:#fafafa;color:#1e0a3c;font-family:Inter,sans-serif;padding:80px 20px 40px">
@@ -432,7 +390,6 @@ export function generateRefundHtml() {
 export const routeGenerators = {
   '/': generateHomeHtml,
   '/pricing': generatePricingHtml,
-  '/faq': generateFaqHtml,
   '/privacy-policy': generatePrivacyHtml,
   '/refund-policy': generateRefundHtml,
 }

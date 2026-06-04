@@ -15,7 +15,7 @@ export function Navbar() {
   const links = [
     { label: t.navFeatures, href: "/#features", external: true },
     { label: t.navPricing, href: "/pricing", external: false },
-    { label: t.navFAQ, href: "/faq", external: false },
+    { label: t.navFAQ, href: "/#faq", external: true },
   ];
 
   const isActive = (href: string) => href === "/pricing" && location.pathname === "/pricing";
