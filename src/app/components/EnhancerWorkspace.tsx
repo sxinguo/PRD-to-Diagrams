@@ -299,7 +299,7 @@ export function EnhancerWorkspace() {
                   </button>
                 </div>
                 <div style={{ borderRadius: 16, overflow: "hidden", border: "1.5px solid rgba(124,58,237,0.1)", boxShadow: "0 4px 20px rgba(124,58,237,0.08)" }}>
-                  <img src={uploadedImage} alt="Uploaded mermaid diagram ready for AI enhancement" className="w-full object-contain"
+                  <img src={uploadedImage} alt="Uploaded diagram ready for AI enhancement" className="w-full object-contain"
                     style={{ maxHeight: 340, background: "#f8f7ff" }} />
                 </div>
               </motion.div>
