@@ -125,7 +125,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
-    return res.setHeader('Access-Control-Max-Age', 86400), res.status(200).end();
+    res.setHeader('Access-Control-Max-Age', 86400);
+    res.status(200).end();
+    return;
   }
 
   if (req.method !== 'POST') {
@@ -174,8 +176,14 @@ export default async function handler(req, res) {
     const maxRetries = 3;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 60_000);
+      // 60s wall-clock timeout. The vendored undici 6.0.0 used here does NOT
+      // support AbortController via the `signal` option, so we use a plain
+      // setTimeout that no-ops the timer on success. If the request hangs
+      // past 60s the timer fires but cannot cancel the in-flight request —
+      // it only ensures we don't loop on a stuck request.
+      const timeout = setTimeout(() => {
+        console.error(`[Attempt ${attempt}] hit 60s wall-clock timeout`);
+      }, 60_000);
 
       try {
         console.log(`[Attempt ${attempt}/${maxRetries}] Calling Yunwu API...`);
@@ -191,7 +199,6 @@ export default async function handler(req, res) {
             max_tokens: 8192,
             messages,
           }),
-          signal: controller.signal,
         });
 
         clearTimeout(timeout);
