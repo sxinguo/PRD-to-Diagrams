@@ -7,16 +7,22 @@ const samples = [
     key: "arch",
     before: "PRD Text",
     after: "Sequence Diagram",
+    image: "/showcase/gallery-sequence.png",
+    imageAlt: "Sequence diagram generated from PRD showing service-to-service interactions",
   },
   {
     key: "portrait",
     before: "PRD Text",
     after: "Flowchart",
+    image: "/showcase/gallery-flowchart-1.png",
+    imageAlt: "E-commerce checkout flowchart generated from PRD showing purchase decision and payment retry flow",
   },
   {
     key: "wildlife",
     before: "PRD Text",
     after: "User Journey",
+    image: "/showcase/gallery-journey.png",
+    imageAlt: "User journey map generated from PRD showing satisfaction scores across four customer journey sections",
   },
 ];
 
@@ -107,22 +113,19 @@ export function FeaturesSection() {
               <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
                 <div className="absolute inset-0 flex items-center justify-center"
                   style={{ background: "linear-gradient(135deg, #f8f7ff 0%, #fdf4ff 100%)" }}>
-                  <div className="text-center">
-                    {s.key === "arch" && <List size={40} style={{ color: "#7c3aed", marginBottom: 8 }} />}
-                    {s.key === "portrait" && <GitBranch size={40} style={{ color: "#6366f1", marginBottom: 8 }} />}
-                    {s.key === "wildlife" && <Map size={40} style={{ color: "#a855f7", marginBottom: 8 }} />}
-                    <span style={{ color: "#1e0a3c", fontWeight: 600, fontSize: "0.9rem" }}>{s.after}</span>
-                  </div>
+                  <img
+                    src={s.image}
+                    alt={s.imageAlt}
+                    loading="lazy"
+                    className="w-full h-full object-contain p-3"
+                    style={{ display: "block" }}
+                  />
                 </div>
                 <div className="absolute inset-0 flex items-end">
-                  <div className="w-full flex justify-between px-3 pb-3">
+                  <div className="w-full flex px-3 pb-3">
                     <span className="text-xs px-2.5 py-1 rounded-lg"
                       style={{ background: "rgba(255,255,255,0.92)", color: "#6b7280", border: "1px solid rgba(0,0,0,0.06)" }}>
                       {t.galHoverBefore}
-                    </span>
-                    <span className="text-xs px-2.5 py-1 rounded-lg"
-                      style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "#fff" }}>
-                      {t.galAfter}
                     </span>
                   </div>
                 </div>
