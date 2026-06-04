@@ -29,8 +29,8 @@ export function HeroSection() {
     if (isGenerating) {
       setProgress(0);
       progressIntervalRef.current = setInterval(() => {
-        setProgress(prev => Math.min(prev + 3, 90));
-      }, 500);
+        setProgress(prev => Math.min(prev + 1, 90));
+      }, 165);
     } else {
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
