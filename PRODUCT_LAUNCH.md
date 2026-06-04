@@ -35,15 +35,7 @@ Turn PRDs into clear sequence, flow, and journey diagrams with AI.
 ## 3. Short Description（短描述，100 词以内）
 
 ```
-PRD Chart is an AI-powered web app that converts Product Requirements
-Documents into clear visual diagrams. Paste a PRD or upload a .docx
-file, and the tool instantly generates editable Mermaid sequence
-diagrams, flowcharts, and user journey maps. Users can refine the
-output in a built-in Monaco code editor, switch between six color
-themes, and export to PNG. It runs on a
-credit-based system with a generous free tier, making it ideal for
-PMs, designers, and developers who need to communicate product
-behavior fast.
+PRD Chart is an AI-powered web app that converts Product Requirements Documents into clear visual diagrams. Paste a PRD or upload a .docx file, and the tool instantly generates editable Mermaid sequence diagrams, flowcharts, and user journey maps. Users can refine the output in a built-in Monaco code editor, switch between six color themes, and export to PNG. It runs on a credit-based system with a generous free tier, making it ideal for PMs, designers, and developers who need to communicate product behavior fast.
 ```
 (98 words)
 
@@ -250,7 +242,71 @@ Here's what I learned shipping it.
 
 ---
 
-## 11. Common Q&A（常见问答，PH 评论区 / FAQ 备用）
+## 11. First Comment（第一条评论，发布时由你主动发出）
+
+> **Write the first comment** — This comment will be posted upon launch.
+> Adding a first comment is essential to get the discussion started.
+
+### Maker's first comment template (English)
+
+```
+Hey Product Hunt! 👋
+
+I'm [your name], the maker of PRD Chart. I built this because I got
+tired of staring at 3-page PRDs trying to picture what the API flow
+was actually going to look like — and then drawing it on a whiteboard
+to show the team.
+
+What it does: paste a PRD (or upload a .docx) and get a clean Mermaid
+sequence diagram, flowchart, or user journey map in seconds. You can
+then tweak the Mermaid code directly in a Monaco editor, switch
+between 6 color themes, and export to SVG/PNG.
+
+I'd love your feedback, especially on:
+🔹 Which diagram types should I add next? (ER diagrams? State
+   machines? Architecture diagrams?)
+🔹 Does the Mermaid output feel production-ready, or do you usually
+   end up rewriting it?
+🔹 What other AI tools in this space have you tried, and what did
+   they miss?
+
+Free tier: 12 credits on signup + 3 daily. Let me know what you
+build with it 🚀
+```
+
+### 中文版本（如果首发主战场是中文社区）
+
+```
+嗨，Product Hunt 的朋友们！👋
+
+我是 [你的名字]，PRD Chart 的作者。建这个工具的契机很简单：
+每次看完一份 3 页纸的 PRD，要靠脑补才能想象出 API 调用流程长啥样，
+然后还得在白板上画一遍给团队看，太低效了。
+
+PRD Chart 能让你直接粘贴 PRD（或上传 .docx），几秒钟生成一张干净的
+Mermaid 序列图 / 流程图 / 用户旅程图。生成后可以在 Monaco 编辑器
+里直接改 Mermaid 代码，换 6 套配色主题，导出 SVG/PNG。
+
+特别想听听大家的反馈：
+🔹 下一版应该加什么图？ER 图？状态机？架构图？
+🔹 生成的 Mermaid 能不能直接用，还是得大改？
+🔹 你之前用过这类 AI 工具吗？它们缺什么？
+
+免费版：注册送 12 积分。期待看到你们的作品 🚀
+```
+
+### 几个发布小贴士
+
+- 第一条评论最好在 **发布后 5 分钟内**发出，引导讨论方向
+- 发布后 **2 小时内**回复每一条评论，越快越好
+- 每条回复尽量 **@ 用户名 + 给具体答案**，别只回 "Thank you!"
+- 收到负面反馈时**先承认问题，再说改进计划**，不要辩解
+- 顶置 1–2 条最有价值的早期用户评论
+- 头 24 小时的活跃度直接决定 PH 排名走势，**至少留 2 个时段盯评论区**
+
+---
+
+## 12. Common Q&A（常见问答，PH 评论区 / FAQ 备用）
 
 ```
 Q: How is this different from ChatGPT or other AI chat tools?
@@ -285,7 +341,7 @@ A: PayPal, including credit cards paid via PayPal.
 
 ---
 
-## 12. Brand & Visual Notes（品牌与视觉备注，给设计师 / Hunter 参考）
+## 13. Brand & Visual Notes（品牌与视觉备注，给设计师 / Hunter 参考）
 
 ```
 Primary color:    #7C3AED  (purple-600, brand)
@@ -302,7 +358,7 @@ Logo style:       Wordmark "PRD Chart" with a small diagram node icon
 
 ---
 
-## 13. Links（链接，发布前补全）
+## 14. Links（链接，发布前补全）
 
 ```
 Website:        [TODO: your domain]

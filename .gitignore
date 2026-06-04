@@ -6,3 +6,10 @@ dist
 .DS_Store
 
 .vercel
+.env*.local
+proxy-shim.cjs
+api/_vendor/
+
+# Local-only Claude Code instructions (contains project-specific guidance for the agent, not for the repo)
+CLAUDE.md
+
