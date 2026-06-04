@@ -74,6 +74,11 @@ const COLOR_THEMES = {
 mermaid.initialize({
   startOnLoad: false,
   theme: 'base',
+  // Use native SVG <text> instead of <foreignObject> for labels so:
+  // 1) Canvas-to-PNG download doesn't drop text (foreignObject was being stripped
+  //    to prevent canvas taint, but in Mermaid v11 all labels live in foreignObject).
+  // 2) Avoids htmlLabel external-resource taint risks entirely.
+  htmlLabels: false,
   themeVariables: COLOR_THEMES.purple
 });
 
@@ -387,6 +392,7 @@ export function EditorPage() {
       mermaid.initialize({
         startOnLoad: false,
         theme: 'base',
+        htmlLabels: false,
         themeVariables: COLOR_THEMES[currentTheme]
       });
       const { svg } = await mermaid.render(id, mermaidCode);
@@ -453,6 +459,7 @@ export function EditorPage() {
         mermaid.initialize({
           startOnLoad: false,
           theme: 'base',
+          htmlLabels: false,
           themeVariables: COLOR_THEMES[currentTheme]
         });
         const { svg } = await mermaid.render(id, code);
@@ -589,6 +596,7 @@ export function EditorPage() {
           mermaid.initialize({
           startOnLoad: false,
           theme: 'base',
+          htmlLabels: false,
           themeVariables: COLOR_THEMES[currentTheme]
         });
           const id = `mermaid-${Date.now()}`;

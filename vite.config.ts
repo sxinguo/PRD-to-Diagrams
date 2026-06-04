@@ -31,9 +31,10 @@ export default defineConfig({
     },
   },
   server: {
+    port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3001',
         changeOrigin: true,
       },
     },
@@ -41,4 +42,19 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  // Mermaid v11 splits each diagram type into its own chunk (e.g. journeyDiagram,
+  // flowchartDiagram) and loads them via dynamic import the first time the user
+  // renders that type. Vite normally pre-bundles on demand, and the second load
+  // hits "Outdated Optimize Dep" 504s — which manifest as a "Syntax error in text"
+  // because the parser chunk never makes it to the browser. Pre-include the
+  // diagram types this app uses so they ship as part of the initial dep bundle.
+  optimizeDeps: {
+    include: [
+      'mermaid',
+      'mermaid/dist/diagrams/flowchart/flowchartDiagram',
+      'mermaid/dist/diagrams/sequence/sequenceDiagram',
+      'mermaid/dist/diagrams/user-journey/journeyDiagram',
+    ],
+  },
 })
