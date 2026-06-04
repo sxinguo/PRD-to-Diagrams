@@ -16,9 +16,9 @@ export function HeroSection() {
   const [showCreditModal, setShowCreditModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<{ name: string; content: string } | null>(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [progress, setProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { user, refreshProfile } = useAuth();
 
   useEffect(() => {
@@ -27,18 +27,18 @@ export function HeroSection() {
 
   useEffect(() => {
     if (isGenerating) {
-      setElapsedTime(0);
-      timerRef.current = setInterval(() => {
-        setElapsedTime(prev => prev + 1);
-      }, 1000);
+      setProgress(0);
+      progressIntervalRef.current = setInterval(() => {
+        setProgress(prev => Math.min(prev + 3, 90));
+      }, 500);
     } else {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
       }
     }
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     };
   }, [isGenerating]);
 
@@ -239,9 +239,10 @@ export function HeroSection() {
                 <span className="text-xs" style={{ color: "#7c3aed", fontWeight: 500 }}>{uploadedFile.name}</span>
                 <button
                   onClick={() => setUploadedFile(null)}
+                  disabled={isGenerating}
                   className="ml-1"
-                  style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
-                  <X size={14} style={{ color: "#7c3aed" }} />
+                  style={{ background: "none", border: "none", cursor: isGenerating ? "not-allowed" : "pointer", padding: 0, display: "flex" }}>
+                  <X size={14} style={{ color: isGenerating ? "#d1d5db" : "#7c3aed" }} />
                 </button>
               </div>
             )}
@@ -256,12 +257,13 @@ export function HeroSection() {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
+                disabled={isGenerating}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg"
                 style={{
-                  background: "#f5f3ff",
-                  border: "1px solid rgba(124,58,237,0.2)",
-                  color: "#7c3aed",
-                  cursor: "pointer",
+                  background: isGenerating ? "#f3f4f6" : "#f5f3ff",
+                  border: isGenerating ? "1px solid rgba(124,58,237,0.05)" : "1px solid rgba(124,58,237,0.2)",
+                  color: isGenerating ? "#d1d5db" : "#7c3aed",
+                  cursor: isGenerating ? "not-allowed" : "pointer",
                   fontSize: "0.85rem",
                   fontWeight: 500,
                 }}>
@@ -288,29 +290,21 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Progress bar */}
+          {/* Progress bar — matches Editor.tsx style */}
           {isGenerating && (
             <div className="mt-3 w-full">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs text-gray-500">AI is generating your diagram...</p>
-                <span className="text-xs font-mono text-purple-600">{elapsedTime}s</span>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span style={{ color: "#6b7280" }}>Generating diagram...</span>
+                <span style={{ color: "#7c3aed", fontWeight: 600 }}>{Math.min(100, Math.round(progress))}%</span>
               </div>
-              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600"
-                  style={{
-                    width: '100%',
-                    backgroundSize: '200% 100%',
-                    animation: 'shimmer 2s linear infinite'
-                  }}
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: "#ede9fe" }}>
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ background: "linear-gradient(90deg, #7c3aed, #a855f7)" }}
+                  animate={{ width: `${Math.min(100, progress)}%` }}
+                  transition={{ duration: 0.1 }}
                 />
               </div>
-              <style>{`
-                @keyframes shimmer {
-                  0% { background-position: 200% 0; }
-                  100% { background-position: -200% 0; }
-                }
-              `}</style>
             </div>
           )}
         </div>
