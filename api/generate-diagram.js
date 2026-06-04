@@ -1,24 +1,16 @@
-// In local dev (vercel dev), the API handler runs in a VM context that
-// doesn't share globals with the parent process where proxy-shim.cjs ran.
-// So `setGlobalDispatcher` from proxy-shim has no effect on the fetch
-// available inside this handler. We work around that by importing undici
-// from a vendored copy (api/_vendor/undici) and routing every fetch call
-// through our own ProxyAgent when PROXY_URL is set. In production
-// (Vercel), PROXY_URL is unset and we use undici's default fetch (direct
-// connection — Supabase is reachable from Vercel's network).
+// Use Node 18+ built-in fetch. proxy-shim.cjs (loaded via `node --require`
+// for local dev) sets a global undici dispatcher that this fetch will
+// pick up automatically. On Vercel (Node 18+, no PROXY_URL) the global
+// dispatcher is the default and connections go direct — Supabase and
+// yunwu.ai are both reachable from Vercel's network.
 //
-// We use a vendored copy instead of npm because registry.npmjs.org is
-// blocked from this dev machine, and the project has no internet for
-// `npm install`. If/when the network situation changes, this can be
-// replaced with `import { ... } from 'undici'`.
-import undici from './_vendor/undici/index.js';
-const { fetch: undiciFetch, ProxyAgent, Agent: UndiciAgent } = undici;
-
-const _proxyUrl = process.env.PROXY_URL || process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
-const _dispatcher = _proxyUrl
-  ? new ProxyAgent({ uri: _proxyUrl, connect: { timeout: 10_000 } })
-  : new UndiciAgent();
-const _fetch = (input, init = {}) => undiciFetch(input, { ...init, dispatcher: _dispatcher });
+// The previous version imported from ./_vendor/undici to work around the
+// VM context inside `vercel dev` not seeing proxy-shim's setGlobalDispatcher.
+// That vendored copy is gitignored, so it was never deployed to Vercel —
+// every prod call failed with FUNCTION_INVOCATION_FAILED at module load.
+// Node 18+ built-in fetch is the global undici under the hood, so it
+// shares the same global dispatcher registry. Removing the vendored copy
+// makes the function deploy correctly to Vercel.
 
 // ============================================================================
 // SYSTEM_PROMPT — single source of truth for chart generation.
@@ -147,7 +139,7 @@ export default async function handler(req, res) {
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxZHJ5d2NrdnFycHV2YWRkc3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzIwNTgsImV4cCI6MjA5NDc0ODA1OH0.mB7voJp7T1LZ1iL9Rb3g5scm_CypmufPxb47t4sMmQ8';
 
     // 扣积分
-    const deductResp = await _fetch(`${supabaseUrl}/rest/v1/rpc/deduct_credits`, {
+    const deductResp = await fetch(`${supabaseUrl}/rest/v1/rpc/deduct_credits`, {
       method: 'POST',
       headers: {
         'apikey': supabaseKey,
@@ -188,7 +180,7 @@ export default async function handler(req, res) {
       try {
         console.log(`[Attempt ${attempt}/${maxRetries}] Calling Yunwu API...`);
 
-        const response = await _fetch('https://yunwu.ai/v1/chat/completions', {
+        const response = await fetch('https://yunwu.ai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
