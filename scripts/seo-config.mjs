@@ -3,7 +3,7 @@
 
 const SITE_URL = 'https://www.prdchart.art'
 const SITE_NAME = 'PRD Chart'
-const OG_IMAGE = `${SITE_URL}/showcase/sequence-1.png`
+const OG_IMAGE = `${SITE_URL}/showcase/sequence-1.webp`
 
 export const routes = [
   {

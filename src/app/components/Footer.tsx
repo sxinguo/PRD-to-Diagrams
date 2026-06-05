@@ -19,7 +19,7 @@ export function Footer() {
           <div className="flex-shrink-0">
             <div className="flex items-center gap-2 mb-4">
               <img
-                src="/logo.png"
+                src="/logo.webp"
                 alt="PRD Chart - Mermaid diagram generator"
                 className="w-8 h-8 rounded-lg"
                 style={{ objectFit: "cover" }}

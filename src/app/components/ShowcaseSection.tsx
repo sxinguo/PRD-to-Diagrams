@@ -5,10 +5,10 @@ import { useLang } from "../i18n";
 type Category = "all" | "sequence" | "flowchart" | "journey";
 
 const showcaseImages: Record<Category, string> = {
-  all: "/showcase/sequence-1.png",
-  sequence: "/showcase/sequence-1.png",
-  flowchart: "/showcase/flowchart-1.png",
-  journey: "/showcase/journey-1.png",
+  all: "/showcase/sequence-1.webp",
+  sequence: "/showcase/sequence-1.webp",
+  flowchart: "/showcase/flowchart-1.webp",
+  journey: "/showcase/journey-1.webp",
 };
 
 export function ShowcaseSection() {
