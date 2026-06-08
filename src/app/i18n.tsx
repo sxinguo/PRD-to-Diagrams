@@ -14,7 +14,7 @@ export const translations = {
 
     // Hero
     heroH1a: "Turn Your PRD into",
-    heroH1b: "Charts & Diagrams",
+    heroH1b: "mermaid Charts & Diagrams",
     heroDesc: "Built for product managers and developers. Upload your PRD, AI instantly generates sequence diagrams, flowcharts, and journey maps.",
     heroCTA: "Start Generating",
     heroDemo: "View Examples",

@@ -35,9 +35,9 @@ export function ShowcaseSection() {
           </div>
           <h2 style={{ color: "#1e0a3c", letterSpacing: "-0.03em", marginBottom: 10, fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 800 }}>
             {lang === "zh" ? (
-              <>从 PRD 到专业图表，<span style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>一键生成</span></>
+              <>看真 PRD 转出的<span style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>图表</span></>
             ) : (
-              <>From PRD to Beautiful Diagrams, <span style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>One Click</span></>
+              <>See Real Diagrams from <span style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Your PRDs</span></>
             )}
           </h2>
           <p style={{ color: "#9ca3af", maxWidth: 460, margin: "0 auto", fontSize: "0.95rem" }}>
