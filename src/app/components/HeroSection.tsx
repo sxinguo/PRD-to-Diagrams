@@ -195,7 +195,7 @@ export function HeroSection() {
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
             fontSize: "0.75em",
-            whiteSpace: "nowrap",
+            display: "block",
           }}>
             {t.heroH1b}
           </span>
