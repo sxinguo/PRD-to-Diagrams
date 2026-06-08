@@ -16,7 +16,7 @@ const OUT = resolve(ROOT, 'dist')
 
 // Read translations from i18n.tsx (parse the JS object)
 function getTranslations() {
-  const content = readFileSync(resolve(ROOT, 'src/app/i18n.tsx'), 'utf-8')
+  const content = readFileSync(resolve(ROOT, 'src/app/i18n.tsx'), 'utf-8').replace(/\r\n/g, '\n')
   const enMatch = content.match(/en:\s*\{([\s\S]*?)\n  \},?\n  zh:/)
   if (!enMatch) {
     console.warn('Could not parse en translations from i18n.tsx')
