@@ -13,8 +13,8 @@ export const translations = {
     navGetStarted: "Get Started Free",
 
     // Hero
-    heroH1a: "Turn PRD into Mermaid",
-    heroH1b: "Charts Instantly",
+    heroH1a: "Turn Your PRD into",
+    heroH1b: "Charts & Diagrams",
     heroDesc: "Built for product managers and developers. Upload your PRD, AI instantly generates sequence diagrams, flowcharts, and journey maps.",
     heroCTA: "Start Generating",
     heroDemo: "View Examples",
@@ -154,8 +154,8 @@ export const translations = {
     navSignIn: "登录",
     navGetStarted: "免费开始使用",
 
-    heroH1a: "将 PRD 转化为 Mermaid",
-    heroH1b: "图表，一键生成",
+    heroH1a: "把 PRD 变成",
+    heroH1b: "图表",
     heroDesc: "专为产品经理和程序员打造。上传 PRD，AI 即时生成时序图、流程图、旅程地图。",
     heroCTA: "开始生成",
     heroDemo: "查看示例",
