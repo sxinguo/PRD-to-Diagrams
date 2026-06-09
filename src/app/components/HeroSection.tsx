@@ -193,6 +193,7 @@ export function HeroSection() {
             backgroundClip: "text",
             fontSize: "0.75em",
             display: "block",
+            lineHeight: 1.3,
           }}>
             {t.heroH1b}
           </span>

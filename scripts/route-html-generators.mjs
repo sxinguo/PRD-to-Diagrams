@@ -75,7 +75,7 @@ export function generateHomeHtml(t) {
     <div style="position:relative;z-index:10;max-width:800px">
       <h1 style="font-size:clamp(2.4rem,6vw,4.4rem);font-weight:800;line-height:1.1;letter-spacing:-0.04em;margin-bottom:20px">
         ${esc(t.heroH1a)}<br>
-        <span style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#6366f1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:0.75em;display:block">${esc(t.heroH1b)}</span>
+        <span style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#6366f1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:0.75em;display:block;line-height:1.3">${esc(t.heroH1b)}</span>
       </h1>
       <p style="color:#6b7280;line-height:1.75;font-size:1.1rem;max-width:540px;margin:0 auto 32px">${esc(t.heroDesc)}</p>
       <div style="width:100%;max-width:672px;margin:0 auto 24px">
