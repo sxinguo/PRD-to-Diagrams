@@ -25,6 +25,11 @@ function navbar(t) {
     <a href="/#faq" style="color:#4b5563;text-decoration:none;font-size:0.9rem">${esc(t.navFAQ)}</a>
   </div>
   <div style="display:flex;align-items:center;gap:12px">
+    <div style="display:flex;align-items:center;border-radius:8px;overflow:hidden;border:1px solid rgba(124,58,237,0.2);background:#f5f3ff">
+      <span style="padding:6px 12px;font-size:0.75rem;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:600">EN</span>
+      <span style="padding:6px 12px;font-size:0.75rem;color:#7c3aed">中文</span>
+    </div>
+    <span style="color:#6b7280;font-size:0.9rem;padding:8px 14px;cursor:pointer">${esc(t.navSignIn)}</span>
     <a href="/editor" style="padding:8px 18px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;color:#fff;font-weight:600;cursor:pointer;font-size:0.875rem;text-decoration:none;box-shadow:0 2px 12px rgba(124,58,237,0.3)">${esc(t.navGetStarted)}</a>
   </div>
 </nav>`
