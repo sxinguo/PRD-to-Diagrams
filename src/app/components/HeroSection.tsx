@@ -172,10 +172,7 @@ export function HeroSection() {
         }} />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 28 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
+      <div
         className="relative z-10 flex flex-col items-center text-center max-w-4xl w-full"
       >
         {/* Headline */}
@@ -314,11 +311,8 @@ export function HeroSection() {
         {/* Feature types */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-2xl mb-8">
           {features.map((f, i) => (
-            <motion.div
+            <div
               key={f.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + i * 0.1, duration: 0.5 }}
               className="flex items-center gap-2.5 p-3 rounded-xl"
               style={{
                 background: "#fff",
@@ -334,21 +328,20 @@ export function HeroSection() {
                 <div style={{ fontWeight: 600, color: "#1e0a3c", fontSize: "0.85rem" }}>{f.label}</div>
                 <div style={{ color: "#9ca3af", fontSize: "0.75rem" }}>{f.desc}</div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
-      </motion.div>
+      </div>
 
       {/* Scroll hint */}
-      <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
+      <div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
         <motion.div
           animate={{ y: [0, 6, 0] }}
           transition={{ repeat: Infinity, duration: 1.6 }}
           style={{ width: 1.5, height: 28, background: "rgba(124,58,237,0.25)", borderRadius: 2 }} />
-      </motion.div>
+      </div>
     </section>
 
     {showAuth && (
